@@ -148,6 +148,7 @@
     .btn-green { background: var(--accent-green); color: #0c1810; }
     .btn-gold { background: var(--accent-gold); color: #1a1c2c; }
     .btn-dark { background: #262b44; }
+    .btn-cyan { background: var(--accent-cyan); color: #0c0d14; }
 
     /* Top Header Bar */
     header {
@@ -218,6 +219,10 @@
       font-size: 8.5px;
       padding: 7px 9px;
       min-height: 36px;
+    }
+
+    .show-mobile-only {
+      display: none;
     }
 
     /* Newspaper Ticker */
@@ -751,6 +756,177 @@
     }
 
     /* ========================================================================
+       INTERACTIVE INITIAL GUIDE (SPOTLIGHT TOUR + FLOATING DIALOGUE CARD)
+       ======================================================================== */
+    .tutorial-dimmer {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 10, 18, 0.72);
+      z-index: 4400;
+      display: none;
+      pointer-events: none;
+    }
+
+    .tutorial-dimmer.active {
+      display: block;
+    }
+
+    .tutorial-spotlight {
+      position: fixed;
+      z-index: 4500;
+      pointer-events: none;
+      border: 4px solid var(--accent-gold);
+      box-shadow:
+        0 0 0 4px var(--border-black),
+        0 0 22px rgba(255, 205, 117, 0.85),
+        inset 0 0 12px rgba(255, 205, 117, 0.35);
+      display: none;
+      transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+      animation: spotlightPulse 1.2s infinite ease-in-out;
+    }
+
+    .tutorial-spotlight.active {
+      display: block;
+    }
+
+    @keyframes spotlightPulse {
+      0%, 100% { border-color: var(--accent-gold); }
+      50% { border-color: var(--accent-green-hi); }
+    }
+
+    .tutorial-card {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: min(620px, calc(100vw - 24px));
+      z-index: 4600;
+      padding: 13px 14px;
+      display: none;
+      background: #1c244d;
+    }
+
+    .tutorial-card.active {
+      display: block;
+    }
+
+    .tutorial-card.pos-top {
+      bottom: auto;
+      top: 16px;
+    }
+
+    .tutorial-card.pos-center {
+      bottom: auto;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .tut-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 3px solid var(--border-black);
+    }
+
+    .tut-step-badge {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8.5px;
+      background: var(--accent-gold);
+      color: var(--bg-dark);
+      padding: 4px 7px;
+      box-shadow: 0 0 0 2px var(--border-black);
+    }
+
+    .tut-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .tut-dot {
+      width: 10px;
+      height: 10px;
+      background: #0c0d14;
+      box-shadow: 0 0 0 2px var(--border-black);
+    }
+
+    .tut-dot.done {
+      background: var(--accent-green);
+    }
+
+    .tut-dot.current {
+      background: var(--accent-gold);
+    }
+
+    .tut-speaker {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .tut-avatar {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      background: var(--accent-red);
+      box-shadow: 0 0 0 3px var(--border-black), inset 0 0 0 3px var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .tut-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: var(--accent-gold);
+      margin: 0 0 5px 0;
+      line-height: 1.45;
+    }
+
+    .tut-body {
+      font-size: 19px;
+      color: var(--text-light);
+      line-height: 1.32;
+    }
+
+    .tut-task-box {
+      background: #11152c;
+      border-left: 4px solid var(--accent-cyan);
+      padding: 7px 10px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tut-task-box.completed {
+      border-left-color: var(--accent-green);
+      color: var(--accent-green-hi);
+    }
+
+    .tut-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tut-actions .pixel-btn {
+      font-size: 9px;
+      padding: 8px 11px;
+      min-height: 38px;
+    }
+
+    /* ========================================================================
        MOBILE-FIRST RESPONSIVE ERGONOMICS (<= 900px)
        ======================================================================== */
     @media (max-width: 900px) {
@@ -777,18 +953,24 @@
       .header-controls {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 5px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
       }
 
       .header-controls .pixel-btn {
-        font-size: 7.5px;
-        padding: 6px 4px;
+        font-size: 7px;
+        padding: 5px 2px;
         min-height: 36px;
+        flex-direction: column;
+        gap: 2px;
       }
 
       .hide-mobile-label {
         display: none;
+      }
+
+      .show-mobile-only {
+        display: inline;
       }
 
       .ticker-bar {
@@ -949,6 +1131,17 @@
       .mob-nav-badge.visible {
         display: inline-block;
       }
+
+      /* Mobile Tutorial Card positioning above bottom nav */
+      .tutorial-card {
+        bottom: calc(66px + var(--safe-bottom));
+        padding: 10px 11px;
+      }
+
+      .tutorial-card.pos-top {
+        bottom: auto;
+        top: 98px;
+      }
     }
 
     /* Extra-narrow phone adjustments (< 500px) */
@@ -1003,11 +1196,12 @@
     </div>
 
     <div class="header-controls">
+      <button class="pixel-btn btn-cyan" id="btnOpenGuide" onclick="startInteractiveGuide(true)" title="Riapri la guida interattiva">❓ <span class="hide-mobile-label">GUIDA</span><span class="show-mobile-only">GUIDA</span></button>
       <button class="pixel-btn btn-gold" id="btnOpenPrestige" onclick="openPrestigeModal()">🌊 <span class="hide-mobile-label">ONDA STORICA</span><span class="show-mobile-only">ONDA</span></button>
       <button class="pixel-btn btn-dark" onclick="openStatsModal()">📊 <span class="hide-mobile-label">ARCHIVIO & FINALI</span><span class="show-mobile-only">FINALI</span></button>
       <button class="pixel-btn btn-dark" onclick="openSaveModal()">💾 <span class="hide-mobile-label">SALVATAGGIO</span><span class="show-mobile-only">SALVA</span></button>
-      <button class="pixel-btn btn-dark" id="btnCrt" onclick="toggleCrt()">📺 <span class="hide-mobile-label">CRT: ON</span></button>
-      <button class="pixel-btn btn-dark" id="btnAudio" onclick="toggleAudio()">🔊 <span class="hide-mobile-label">AUDIO: ON</span></button>
+      <button class="pixel-btn btn-dark" id="btnCrt" onclick="toggleCrt()">📺 <span class="hide-mobile-label">CRT: ON</span><span class="show-mobile-only">CRT</span></button>
+      <button class="pixel-btn btn-dark" id="btnAudio" onclick="toggleAudio()">🔊 <span class="hide-mobile-label">AUDIO: ON</span><span class="show-mobile-only">AUDIO</span></button>
     </div>
   </header>
 
@@ -1065,44 +1259,46 @@
         </div>
       </div>
 
-      <!-- Primary Currencies -->
-      <div class="res-grid">
-        <div class="res-card">
-          <div class="res-name"><span>🧠 COSCIENZA</span></div>
-          <div class="res-val" id="resConsciousness">0</div>
-          <div class="res-rate" id="rateConsciousness">+0.0 /s</div>
+      <!-- Primary Currencies & Meters Container -->
+      <div id="piazzaResourcesArea">
+        <div class="res-grid">
+          <div class="res-card">
+            <div class="res-name"><span>🧠 COSCIENZA</span></div>
+            <div class="res-val" id="resConsciousness">0</div>
+            <div class="res-rate" id="rateConsciousness">+0.0 /s</div>
+          </div>
+          <div class="res-card">
+            <div class="res-name"><span>🤝 MUTUO SOCCORSO</span></div>
+            <div class="res-val" id="resSolidarity">0</div>
+            <div class="res-rate" id="rateSolidarity">+0.0 /s</div>
+          </div>
         </div>
-        <div class="res-card">
-          <div class="res-name"><span>🤝 MUTUO SOCCORSO</span></div>
-          <div class="res-val" id="resSolidarity">0</div>
-          <div class="res-rate" id="rateSolidarity">+0.0 /s</div>
-        </div>
-      </div>
 
-      <!-- Burnout Warning -->
-      <div class="burnout-banner" id="burnoutBanner">
-        ⚠️ BURNOUT COLLETTIVO! PRODUZIONE DIMEZZATA! ORGANIZZARE RIPOSO!
-      </div>
+        <!-- Burnout Warning -->
+        <div class="burnout-banner" id="burnoutBanner">
+          ⚠️ BURNOUT COLLETTIVO! PRODUZIONE DIMEZZATA! ORGANIZZARE RIPOSO!
+        </div>
 
-      <!-- Energia Vitale Bar -->
-      <div class="meter-box">
-        <div class="meter-header">
-          <span>⚡ ENERGIA VITALE</span>
-          <span id="energyText">100 / 100 (+0.5/s)</span>
+        <!-- Energia Vitale Bar -->
+        <div class="meter-box">
+          <div class="meter-header">
+            <span>⚡ ENERGIA VITALE</span>
+            <span id="energyText">100 / 100 (+0.5/s)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-energy" id="energyBar" style="width:100%;"></div>
+          </div>
         </div>
-        <div class="bar-track">
-          <div class="bar-fill bar-energy" id="energyBar" style="width:100%;"></div>
-        </div>
-      </div>
 
-      <!-- Indice di Sfruttamento Bar -->
-      <div class="meter-box">
-        <div class="meter-header">
-          <span style="color:var(--accent-red-hi);">🏭 INDICE SFRUTTAMENTO</span>
-          <span id="exploitText">35.0% (+0.15%/s)</span>
-        </div>
-        <div class="bar-track">
-          <div class="bar-fill bar-exploit" id="exploitBar" style="width:35%;"></div>
+        <!-- Indice di Sfruttamento Bar -->
+        <div class="meter-box">
+          <div class="meter-header">
+            <span style="color:var(--accent-red-hi);">🏭 INDICE SFRUTTAMENTO</span>
+            <span id="exploitText">35.0% (+0.15%/s)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill bar-exploit" id="exploitBar" style="width:35%;"></div>
+          </div>
         </div>
       </div>
 
@@ -1131,7 +1327,7 @@
       </div>
 
       <!-- Act Progression Card -->
-      <div class="act-card" style="margin-top:12px; margin-bottom:0;">
+      <div class="act-card" id="actProgressCard" style="margin-top:12px; margin-bottom:0;">
         <div class="act-title" id="actCardTitle">ATTO I: IL RISVEGLIO NEL QUARTIERE</div>
         <div class="act-desc" id="actCardDesc">
           Dalle cucine popolari ai gruppi d'acquisto: trasformare il disagio individuale in forza collettiva.
@@ -1191,6 +1387,34 @@
       <span>CRONACA</span>
     </button>
   </nav>
+
+  <!-- INTERACTIVE TUTORIAL OVERLAY & DIALOGUE CARD -->
+  <div class="tutorial-dimmer" id="tutorialDimmer"></div>
+  <div class="tutorial-spotlight" id="tutorialSpotlight"></div>
+  <aside class="tutorial-card pixel-box" id="tutorialCard" role="dialog" aria-modal="false" aria-labelledby="tutStepTitle">
+    <div class="tut-header">
+      <span class="tut-step-badge" id="tutStepBadge">MANUALE • PASSO 1/6</span>
+      <div class="tut-dots" id="tutDots"></div>
+    </div>
+    <div class="tut-speaker">
+      <div class="tut-avatar" aria-hidden="true">✊</div>
+      <div style="flex:1; min-width:0;">
+        <h3 class="tut-title" id="tutStepTitle">Titolo Passo</h3>
+        <div class="tut-body" id="tutStepBody">Spiegazione...</div>
+      </div>
+    </div>
+    <div class="tut-task-box" id="tutTaskBox" style="display:none;">
+      <span id="tutTaskLabel">Obiettivo pratico</span>
+      <strong id="tutTaskCounter">0/1</strong>
+    </div>
+    <div class="tut-actions">
+      <button class="pixel-btn btn-dark" onclick="endInteractiveGuide(false)">SALTA GUIDA</button>
+      <div style="display:flex; gap:6px;">
+        <button class="pixel-btn btn-dark" id="btnTutPrev" onclick="prevTutorialStep()">◀ INDIETRO</button>
+        <button class="pixel-btn btn-gold" id="btnTutNext" onclick="nextTutorialStep()">AVANTI ▶</button>
+      </div>
+    </div>
+  </aside>
 
   <!-- DILEMMA / NEWSPAPER EVENT MODAL -->
   <div class="modal-backdrop" id="eventModal">
@@ -2385,6 +2609,7 @@ function createDefaultState() {
     version: 1,
     lastSaveTime: Date.now(),
     totalPlaySeconds: 0,
+    tutorialCompleted: false,
     wave: 1,
     act: 1,
 
@@ -2631,7 +2856,6 @@ function spawnFloatingText(x, y, text, color = "#ffcd75") {
   const el = document.createElement("div");
   el.className = "float-text";
   el.textContent = text;
-  // Clamp horizontally so floating text never clips off narrow screens
   const clampedX = Math.max(12, Math.min(window.innerWidth - 110, x));
   const clampedY = Math.max(48, y);
   el.style.left = `${clampedX}px`;
@@ -2682,6 +2906,8 @@ function manualLeaflet(ev) {
   if (state.energy <= 0) {
     triggerBurnout();
   }
+
+  TutorialEngine.onAction("leaflet");
   updateUI();
 }
 
@@ -2699,6 +2925,8 @@ function collectiveRest(ev) {
   SoundFX.rest();
   const pos = getEventCoords(ev);
   spawnFloatingText(pos.x, pos.y, `+${Math.round(restore)} ⚡`, "#41a6f6");
+
+  TutorialEngine.onAction("rest");
   updateUI();
 }
 
@@ -2744,6 +2972,7 @@ function buyStructure(id) {
 
   SoundFX.buy();
   renderStructures();
+  TutorialEngine.onAction("buy_structure");
   updateUI();
 }
 
@@ -2787,10 +3016,322 @@ function advanceAct() {
   }
 }
 
-// --- 6. RANDOM NEWSPAPER EVENTS & DILEMMAS ---
+// --- 6. INTERACTIVE INITIAL GUIDE (SPOTLIGHT + STEP-BY-STEP TRAINING) ---
+
+const TutorialEngine = {
+  active: false,
+  stepIndex: 0,
+  stepProgress: 0,
+  grantedStarterKit: false,
+
+  steps: [
+    {
+      title: "BENVENUTO NELLA COMUNE!",
+      body: "Parti da un garage occupato per costruire una società post-capitalista in <strong>4 Atti</strong>. Questo rapido addestramento interattivo ti guiderà tra azioni dirette, riposo e reti mutualistiche.",
+      desktopTarget: null,
+      mobileTarget: null,
+      mobileTab: "piazza",
+      cardPos: "center",
+      task: null
+    },
+    {
+      title: "LE 4 RISORSE DEL MOVIMENTO",
+      body: "<strong>🧠 Coscienza</strong> sblocca Idee e Atti; <strong>🤝 Mutuo Soccorso</strong> finanzia Strutture e Scioperi; <strong>⚡ Energia</strong> sostiene l'azione (a 0 scatta il Burnout); <strong>🏭 Sfruttamento</strong> va tenuto basso (al 100% subisci repressione).",
+      desktopTarget: "#piazzaResourcesArea",
+      mobileTarget: "#mobileStickyHud",
+      mobileTab: "piazza",
+      cardPos: "bottom",
+      task: null
+    },
+    {
+      title: "AZIONE #1: VOLANTINAGGIO",
+      body: "All'inizio la Coscienza Critica si costruisce parlando con i vicini. Tocca il pulsante evidenziato (o la scena del garage) per distribuire volantini e risvegliare il quartiere!",
+      desktopTarget: "#btnLeaflet",
+      mobileTarget: "#mobBtnLeaflet",
+      mobileTab: "piazza",
+      cardPos: "bottom",
+      task: {
+        action: "leaflet",
+        label: "Fai volantinaggio 3 volte",
+        targetCount: 3,
+        optionalOnReplay: true
+      }
+    },
+    {
+      title: "AZIONE #2: RIPOSO & SCIOPERO",
+      body: "Lottare consuma <strong>⚡ Energia</strong>: usa <strong>🛌 Riposo Collettivo</strong> per ricaricarla e curare il Burnout. Quando accumuli <strong>🤝 Mutuo Soccorso</strong>, lancia uno <strong>✊ Sciopero</strong> per abbattere lo Sfruttamento!",
+      desktopTarget: "#btnRest",
+      mobileTarget: "#mobBtnRest",
+      mobileTab: "piazza",
+      cardPos: "bottom",
+      task: {
+        action: "rest",
+        label: "Organizza 1 Riposo Collettivo",
+        targetCount: 1,
+        optionalOnReplay: true
+      }
+    },
+    {
+      title: "AUTOMAZIONE: STRUTTURE E IDEE",
+      body: "Con le <strong>🏘️ Pratiche e Strutture</strong> generi risorse ogni secondo senza fatica! Nella scheda <strong>💡 Idee</strong> trovi invece potenziamenti satirici, mentre le <strong>📰 Edizioni Straordinarie</strong> plasmano il finale.",
+      desktopTarget: "#buy_st_gas",
+      mobileTarget: "#buy_st_gas",
+      mobileTab: "strutture",
+      cardPos: "bottom",
+      onEnter() {
+        // Ensure player can try activating their first GAS structure immediately
+        const gasSt = STRUCTURES_DATA[0];
+        const { costC } = getStructureCost(gasSt);
+        if (!TutorialEngine.grantedStarterKit && state.consciousness < costC && (state.structures["gas"] || 0) === 0) {
+          const boost = costC - state.consciousness;
+          state.consciousness += boost;
+          TutorialEngine.grantedStarterKit = true;
+          spawnFloatingText(window.innerWidth / 2 - 40, 130, `+${Math.ceil(boost)} 🧠 KIT INIZIALE!`, "#41a6f6");
+          renderStructures();
+          updateUI();
+        }
+      },
+      task: {
+        action: "buy_structure",
+        label: "Attiva 1 Struttura (es. GAS)",
+        targetCount: 1,
+        optionalOnReplay: true
+      }
+    },
+    {
+      title: "VERSO L'ONDA STORICA!",
+      body: "Soddisfa i requisiti dell'Atto per avanzare fino all'<strong>Atto IV</strong>. Raggiunta la società post-scarsità, apri <strong>🌊 Onda Storica</strong> per sbloccare uno dei <strong>4 Finali</strong> e ottenere <strong>📚 Memoria Storica</strong> permanente!",
+      desktopTarget: "#actProgressCard",
+      mobileTarget: "#actProgressCard",
+      mobileTab: "piazza",
+      cardPos: "top",
+      task: null
+    }
+  ],
+
+  isMobile() {
+    return window.innerWidth <= 900;
+  },
+
+  start(isManualReplay = false) {
+    this.active = true;
+    this.stepIndex = 0;
+    this.stepProgress = 0;
+    this.grantedStarterKit = false;
+
+    if (isManualReplay && state.inBurnout) {
+      state.inBurnout = false;
+      state.energy = Math.max(state.energy, 40);
+    }
+
+    document.getElementById("tutorialDimmer").classList.add("active");
+    document.getElementById("tutorialCard").classList.add("active");
+    this.renderStep();
+  },
+
+  renderStep() {
+    if (!this.active) return;
+    const step = this.steps[this.stepIndex];
+    this.stepProgress = 0;
+
+    // On mobile, switch to the appropriate tab so the target element is visible in DOM
+    if (this.isMobile() && step.mobileTab && currentMobileTab !== step.mobileTab) {
+      switchMobileTab(step.mobileTab);
+    }
+
+    if (typeof step.onEnter === "function") {
+      step.onEnter();
+    }
+
+    // Header badge & progress dots
+    document.getElementById("tutStepBadge").textContent = `MANUALE • PASSO ${this.stepIndex + 1}/${this.steps.length}`;
+    const dotsEl = document.getElementById("tutDots");
+    dotsEl.innerHTML = "";
+    this.steps.forEach((_, idx) => {
+      const dot = document.createElement("span");
+      dot.className = "tut-dot" + (idx < this.stepIndex ? " done" : idx === this.stepIndex ? " current" : "");
+      dotsEl.appendChild(dot);
+    });
+
+    document.getElementById("tutStepTitle").textContent = step.title;
+    document.getElementById("tutStepBody").innerHTML = step.body;
+
+    // Task bar handling
+    const taskBox = document.getElementById("tutTaskBox");
+    const nextBtn = document.getElementById("btnTutNext");
+    const prevBtn = document.getElementById("btnTutPrev");
+
+    prevBtn.style.visibility = this.stepIndex === 0 ? "hidden" : "visible";
+
+    if (step.task) {
+      taskBox.style.display = "flex";
+      taskBox.classList.remove("completed");
+      document.getElementById("tutTaskLabel").textContent = `▶ ${step.task.label}`;
+      document.getElementById("tutTaskCounter").textContent = `0/${step.task.targetCount}`;
+
+      // If replaying mid-game, allow skipping ahead without getting stuck
+      const isExperienced = state.tutorialCompleted && (state.stats.totalClicks > 5 || totalStructuresCount() > 0);
+      nextBtn.disabled = !isExperienced;
+      nextBtn.textContent = isExperienced ? "AVANTI ▶" : "COMPLETA AZIONE...";
+    } else {
+      taskBox.style.display = "none";
+      nextBtn.disabled = false;
+      nextBtn.textContent = this.stepIndex === this.steps.length - 1 ? "🚀 INIZIA PARTITA!" : "AVANTI ▶";
+    }
+
+    // Card positioning & spotlight highlight
+    const card = document.getElementById("tutorialCard");
+    card.classList.remove("pos-top", "pos-center");
+    if (step.cardPos === "center") card.classList.add("pos-center");
+    if (step.cardPos === "top") card.classList.add("pos-top");
+
+    // Defer spotlight calculation by 1 frame so mobile tab layout has reflowed
+    requestAnimationFrame(() => this.updateSpotlight());
+  },
+
+  updateSpotlight() {
+    if (!this.active) return;
+    const step = this.steps[this.stepIndex];
+    const spot = document.getElementById("tutorialSpotlight");
+    const selector = this.isMobile() ? step.mobileTarget : step.desktopTarget;
+
+    if (!selector) {
+      spot.classList.remove("active");
+      return;
+    }
+
+    const target = document.querySelector(selector);
+    if (!target) {
+      spot.classList.remove("active");
+      return;
+    }
+
+    // Ensure target is scrolled into view cleanly if needed
+    const rect = target.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      spot.classList.remove("active");
+      return;
+    }
+
+    if (rect.top < 0 || rect.bottom > window.innerHeight - 160) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    const updatedRect = target.getBoundingClientRect();
+    const pad = 5;
+    spot.style.top = `${Math.max(2, updatedRect.top - pad)}px`;
+    spot.style.left = `${Math.max(2, updatedRect.left - pad)}px`;
+    spot.style.width = `${Math.min(window.innerWidth - 4, updatedRect.width + pad * 2)}px`;
+    spot.style.height = `${updatedRect.height + pad * 2}px`;
+    spot.classList.add("active");
+  },
+
+  onAction(actionName) {
+    if (!this.active) return;
+    const step = this.steps[this.stepIndex];
+    if (!step.task || step.task.action !== actionName) return;
+
+    this.stepProgress = Math.min(step.task.targetCount, this.stepProgress + 1);
+    document.getElementById("tutTaskCounter").textContent = `${this.stepProgress}/${step.task.targetCount}`;
+
+    if (this.stepProgress >= step.task.targetCount) {
+      const taskBox = document.getElementById("tutTaskBox");
+      taskBox.classList.add("completed");
+      document.getElementById("tutTaskLabel").textContent = `✔ ${step.task.label} — FATTO!`;
+      const nextBtn = document.getElementById("btnTutNext");
+      nextBtn.disabled = false;
+      nextBtn.textContent = "AVANTI ▶";
+    }
+  },
+
+  next() {
+    if (!this.active) return;
+    SoundFX.click();
+    if (this.stepIndex < this.steps.length - 1) {
+      this.stepIndex += 1;
+      this.renderStep();
+    } else {
+      this.finish(true);
+    }
+  },
+
+  prev() {
+    if (!this.active || this.stepIndex === 0) return;
+    SoundFX.click();
+    this.stepIndex -= 1;
+    this.renderStep();
+  },
+
+  finish(completedFully) {
+    this.active = false;
+    document.getElementById("tutorialDimmer").classList.remove("active");
+    document.getElementById("tutorialSpotlight").classList.remove("active");
+    document.getElementById("tutorialCard").classList.remove("active");
+
+    if (this.isMobile() && currentMobileTab !== "piazza") {
+      switchMobileTab("piazza");
+    }
+
+    if (!state.tutorialCompleted) {
+      state.tutorialCompleted = true;
+      if (completedFully) {
+        state.consciousness += 25;
+        state.solidarity += 15;
+        SoundFX.actUp();
+        spawnFloatingText(window.innerWidth / 2 - 60, 140, "+25 🧠 +15 🤝 PRONTI!", "#ffcd75");
+        addLog("Addestramento di quartiere completato! (+25 🧠, +15 🤝)", "triumph");
+      }
+      saveGame();
+    }
+    updateUI();
+  }
+};
+
+function startInteractiveGuide(isManualReplay = false) {
+  SoundFX.click();
+  TutorialEngine.start(isManualReplay);
+}
+
+function nextTutorialStep() {
+  TutorialEngine.next();
+}
+
+function prevTutorialStep() {
+  TutorialEngine.prev();
+}
+
+function endInteractiveGuide(completed) {
+  SoundFX.click();
+  TutorialEngine.finish(completed);
+}
+
+window.addEventListener("resize", () => {
+  if (TutorialEngine.active) TutorialEngine.updateSpotlight();
+});
+
+window.addEventListener("scroll", () => {
+  if (TutorialEngine.active) TutorialEngine.updateSpotlight();
+}, { passive: true });
+
+document.addEventListener("keydown", (e) => {
+  if (!TutorialEngine.active) return;
+  if (e.key === "Escape") {
+    endInteractiveGuide(false);
+  } else if (e.key === "ArrowRight" || e.key === "Enter") {
+    const nextBtn = document.getElementById("btnTutNext");
+    if (nextBtn && !nextBtn.disabled) {
+      e.preventDefault();
+      nextTutorialStep();
+    }
+  } else if (e.key === "ArrowLeft") {
+    prevTutorialStep();
+  }
+});
+
+// --- 7. RANDOM NEWSPAPER EVENTS & DILEMMAS ---
 
 function triggerRandomEvent() {
-  if (activeEvent) return;
+  if (activeEvent || TutorialEngine.active) return;
   const pool = EVENTS_DATA.filter(ev => ev.minAct <= state.act);
   if (pool.length === 0) return;
 
@@ -2835,7 +3376,7 @@ function resolveEventChoice(choice) {
   updateUI();
 }
 
-// --- 7. PRESTIGE ("NUOVA ONDA STORICA"), DOCTRINES & 4 ENDINGS ---
+// --- 8. PRESTIGE ("NUOVA ONDA STORICA"), DOCTRINES & 4 ENDINGS ---
 
 function calculatePrestigeGain() {
   if (state.act < 4) return 0;
@@ -2928,6 +3469,7 @@ function triggerPrestige() {
   const nextModifiers = [...state.pendingModifiers];
 
   state = createDefaultState();
+  state.tutorialCompleted = true;
   state.wave = nextWave;
   state.memory = keepMemory;
   state.doctrines = keepDoctrines;
@@ -2986,7 +3528,7 @@ function buyDoctrine(id) {
   saveGame();
 }
 
-// --- 8. UI RENDERING & NAVIGATION (DESKTOP + MOBILE TABS) ---
+// --- 9. UI RENDERING & NAVIGATION (DESKTOP + MOBILE TABS) ---
 
 function formatNum(n) {
   if (!isFinite(n)) return "∞";
@@ -3025,7 +3567,7 @@ function switchRightTab(tab) {
 
 function switchMobileTab(tab) {
   currentMobileTab = tab;
-  SoundFX.click();
+  if (!TutorialEngine.active) SoundFX.click();
 
   const pPiazza = document.getElementById("panelPiazza");
   const pStrutture = document.getElementById("panelStrutture");
@@ -3052,6 +3594,9 @@ function switchMobileTab(tab) {
   }
 
   window.scrollTo({ top: 0, behavior: "instant" });
+  if (TutorialEngine.active) {
+    requestAnimationFrame(() => TutorialEngine.updateSpotlight());
+  }
 }
 
 function renderStructures() {
@@ -3310,7 +3855,7 @@ function updateUI() {
   badgeId.classList.toggle("visible", affordableIdeas > 0);
 }
 
-// --- 9. ANIMATED PIXEL-ART CANVAS ENGINE (EVOLVING ACROSS 4 ACTS) ---
+// --- 10. ANIMATED PIXEL-ART CANVAS ENGINE (EVOLVING ACROSS 4 ACTS) ---
 const canvas = document.getElementById("worldCanvas");
 const ctx = canvas.getContext("2d");
 let animTime = 0;
@@ -3434,7 +3979,7 @@ function renderPixelScene(dt) {
   }
 }
 
-// --- 10. MODALS, ARCHIVE & BASE64 SAVE SYSTEM ---
+// --- 11. MODALS, ARCHIVE & BASE64 SAVE SYSTEM ---
 
 function closeModal(id) {
   document.getElementById(id).classList.remove("open");
@@ -3516,6 +4061,9 @@ function importSaveBase64() {
       throw new Error("Formato non valido");
     }
     state = Object.assign(createDefaultState(), parsed);
+    if (state.stats.totalClicks > 0 || totalStructuresCount() > 0) {
+      state.tutorialCompleted = true;
+    }
     saveGame();
     renderStructures();
     renderUpgrades();
@@ -3539,6 +4087,7 @@ function hardResetGame() {
   updateUI();
   closeModal("saveModal");
   SoundFX.burnout();
+  setTimeout(() => TutorialEngine.start(false), 300);
 }
 
 function loadGameAndOfflineProgress() {
@@ -3547,6 +4096,10 @@ function loadGameAndOfflineProgress() {
   try {
     const parsed = JSON.parse(raw);
     state = Object.assign(createDefaultState(), parsed);
+
+    if (state.stats.totalClicks > 0 || totalStructuresCount() > 0 || state.wave > 1) {
+      state.tutorialCompleted = true;
+    }
 
     const now = Date.now();
     const elapsedSec = Math.min(28800, Math.max(0, (now - (state.lastSaveTime || now)) / 1000));
@@ -3592,8 +4145,8 @@ function toggleAudio() {
   if (SoundFX.enabled) SoundFX.click();
   const label = document.getElementById("btnAudio");
   label.innerHTML = SoundFX.enabled
-    ? `🔊 <span class="hide-mobile-label">AUDIO: ON</span>`
-    : `🔇 <span class="hide-mobile-label">AUDIO: OFF</span>`;
+    ? `🔊 <span class="hide-mobile-label">AUDIO: ON</span><span class="show-mobile-only">AUDIO</span>`
+    : `🔇 <span class="hide-mobile-label">AUDIO: OFF</span><span class="show-mobile-only">MUTO</span>`;
 }
 
 function toggleCrt() {
@@ -3601,11 +4154,11 @@ function toggleCrt() {
   SoundFX.click();
   const label = document.getElementById("btnCrt");
   label.innerHTML = on
-    ? `📺 <span class="hide-mobile-label">CRT: ON</span>`
-    : `📺 <span class="hide-mobile-label">CRT: OFF</span>`;
+    ? `📺 <span class="hide-mobile-label">CRT: ON</span><span class="show-mobile-only">CRT</span>`
+    : `📺 <span class="hide-mobile-label">CRT: OFF</span><span class="show-mobile-only">NO CRT</span>`;
 }
 
-// --- 11. MAIN DELTA-TIME GAME LOOP ---
+// --- 12. MAIN DELTA-TIME GAME LOOP ---
 
 let lastFrameTime = performance.now();
 
@@ -3647,10 +4200,12 @@ function gameLoop(now) {
       document.getElementById("tickerText").textContent = TICKER_HEADLINES[tickerIndex];
     }
 
-    eventCooldown -= dt;
-    if (eventCooldown <= 0) {
-      eventCooldown = 48 + Math.random() * 25;
-      triggerRandomEvent();
+    if (!TutorialEngine.active) {
+      eventCooldown -= dt;
+      if (eventCooldown <= 0) {
+        eventCooldown = 48 + Math.random() * 25;
+        triggerRandomEvent();
+      }
     }
 
     autoSaveTimer += dt;
@@ -3665,7 +4220,7 @@ function gameLoop(now) {
   requestAnimationFrame(gameLoop);
 }
 
-// --- 12. BOOTSTRAP ---
+// --- 13. BOOTSTRAP ---
 loadGameAndOfflineProgress();
 renderStructures();
 renderUpgrades();
@@ -3673,6 +4228,11 @@ renderDoctrines();
 renderLogs();
 updateUI();
 requestAnimationFrame(gameLoop);
+
+// Launch interactive guide automatically on first-ever visit
+if (!state.tutorialCompleted && !document.getElementById("infoModal").classList.contains("open")) {
+  setTimeout(() => TutorialEngine.start(false), 350);
+}
 </script>
 </body>
 </html>
