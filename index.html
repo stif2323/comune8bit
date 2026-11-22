@@ -1,0 +1,3312 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMUNE: 8-BIT REVOLUTION</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #1a1c2c;
+      --bg-deep: #11131f;
+      --panel-blue: #29366f;
+      --panel-dark: #1f2854;
+      --panel-hi: #3b5dc9;
+      --accent-red: #b13e53;
+      --accent-red-hi: #ef7d57;
+      --accent-gold: #ffcd75;
+      --accent-green: #38b764;
+      --accent-green-hi: #a7f070;
+      --accent-cyan: #41a6f6;
+      --text-light: #f4f4f4;
+      --text-muted: #94b0c2;
+      --border-black: #0c0d14;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      line-height: 1.3;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(41, 54, 111, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(177, 62, 83, 0.2) 0%, transparent 45%);
+    }
+
+    /* Optional CRT scanlines */
+    body.crt-enabled::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.14) 0px,
+        rgba(0, 0, 0, 0.14) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    h1, h2, h3, .pixel-font {
+      font-family: 'Press Start 2P', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    /* Pixel-art stepped border via box-shadow */
+    .pixel-box {
+      background: var(--panel-blue);
+      position: relative;
+      margin: 6px;
+      box-shadow:
+        0 -4px 0 0 var(--border-black),
+        0 4px 0 0 var(--border-black),
+        -4px 0 0 0 var(--border-black),
+        4px 0 0 0 var(--border-black),
+        inset 0 4px 0 0 rgba(255, 255, 255, 0.12),
+        inset 0 -4px 0 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .pixel-box-dark {
+      background: var(--panel-dark);
+      position: relative;
+      margin: 6px;
+      box-shadow:
+        0 -4px 0 0 var(--border-black),
+        0 4px 0 0 var(--border-black),
+        -4px 0 0 0 var(--border-black),
+        4px 0 0 0 var(--border-black),
+        inset 0 3px 0 0 rgba(255, 255, 255, 0.08),
+        inset 0 -3px 0 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .pixel-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      padding: 10px 12px;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      background: var(--panel-hi);
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-align: center;
+      line-height: 1.4;
+      box-shadow:
+        0 -3px 0 0 var(--border-black),
+        0 3px 0 0 var(--border-black),
+        -3px 0 0 0 var(--border-black),
+        3px 0 0 0 var(--border-black),
+        inset 0 3px 0 0 rgba(255, 255, 255, 0.25),
+        inset 0 -3px 0 0 rgba(0, 0, 0, 0.35);
+      transition: transform 0.05s steps(1);
+    }
+
+    .pixel-btn:hover:not(:disabled) {
+      filter: brightness(1.12);
+    }
+
+    .pixel-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow:
+        0 -3px 0 0 var(--border-black),
+        0 3px 0 0 var(--border-black),
+        -3px 0 0 0 var(--border-black),
+        3px 0 0 0 var(--border-black),
+        inset 0 2px 0 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .pixel-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .btn-red { background: var(--accent-red); }
+    .btn-green { background: var(--accent-green); color: #0c1810; }
+    .btn-gold { background: var(--accent-gold); color: #1a1c2c; }
+    .btn-dark { background: #262b44; }
+
+    /* Top Header Bar */
+    header {
+      background: var(--bg-deep);
+      border-bottom: 4px solid var(--border-black);
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-flag {
+      width: 32px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--accent-red) 50%, #111 50%);
+      box-shadow: 0 0 0 3px var(--border-black), inset 0 0 0 2px var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--accent-gold);
+    }
+
+    .brand h1 {
+      font-size: 14px;
+      margin: 0;
+      color: var(--accent-gold);
+      text-shadow: 2px 2px 0 var(--accent-red);
+    }
+
+    .act-badge {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: var(--accent-red);
+      color: var(--text-light);
+      padding: 5px 8px;
+      box-shadow: 0 0 0 2px var(--border-black);
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .header-controls .pixel-btn {
+      font-size: 9px;
+      padding: 7px 9px;
+    }
+
+    /* Newspaper Ticker */
+    .ticker-bar {
+      background: #141624;
+      border-bottom: 4px solid var(--border-black);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .ticker-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: var(--accent-gold);
+      color: var(--bg-dark);
+      padding: 4px 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ticker-text {
+      color: var(--text-light);
+      font-size: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    /* Main Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr 390px;
+      gap: 10px;
+      padding: 10px;
+      max-width: 1640px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1280px) {
+      .main-grid {
+        grid-template-columns: 340px 1fr;
+      }
+      .col-right {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-title {
+      font-size: 11px;
+      color: var(--accent-gold);
+      margin: 0 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 3px solid rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Pixel Canvas Stage */
+    .canvas-wrapper {
+      background: #0e101a;
+      padding: 6px;
+      box-shadow: inset 0 0 0 3px var(--border-black);
+      margin-bottom: 12px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    #worldCanvas {
+      width: 100%;
+      height: 170px;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .canvas-caption {
+      font-size: 17px;
+      color: var(--accent-gold);
+      background: rgba(12, 13, 20, 0.85);
+      padding: 3px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid var(--border-black);
+    }
+
+    /* Resource Cards */
+    .res-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .res-card {
+      background: var(--panel-dark);
+      padding: 8px 10px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+    }
+
+    .res-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .res-val {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .res-rate {
+      font-size: 17px;
+      color: var(--accent-green-hi);
+      margin-top: 2px;
+    }
+
+    /* Progress Bars (Energy & Exploitation) */
+    .meter-box {
+      background: var(--panel-dark);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+    }
+
+    .meter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8.5px;
+      margin-bottom: 6px;
+    }
+
+    .bar-track {
+      height: 18px;
+      background: #0c0d14;
+      padding: 2px;
+      position: relative;
+      box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.15s linear;
+      position: relative;
+    }
+
+    .bar-fill::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .bar-energy { background: var(--accent-green); }
+    .bar-energy.low { background: var(--accent-gold); }
+    .bar-energy.burnout { background: var(--accent-red); animation: pulseAlert 0.8s infinite; }
+
+    .bar-exploit { background: var(--accent-red); }
+    .bar-exploit.critical { background: #ff2a55; animation: pulseAlert 0.6s infinite; }
+
+    @keyframes pulseAlert {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+    }
+
+    .burnout-banner {
+      background: var(--accent-red);
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8.5px;
+      padding: 7px;
+      text-align: center;
+      margin-bottom: 8px;
+      box-shadow: 0 0 0 2px var(--border-black);
+      display: none;
+      line-height: 1.4;
+    }
+
+    /* Core Action Buttons */
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .main-click-btn {
+      padding: 14px 12px;
+      font-size: 11px;
+      width: 100%;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .btn-subtext {
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      opacity: 0.92;
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Act Progression Banner */
+    .act-card {
+      background: linear-gradient(180deg, #253066 0%, #1b224a 100%);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+    }
+
+    .act-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+
+    .act-desc {
+      font-size: 19px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    /* Structures List */
+    .scroll-list {
+      max-height: 620px;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scroll-list::-webkit-scrollbar {
+      width: 10px;
+    }
+    .scroll-list::-webkit-scrollbar-track {
+      background: #11131f;
+    }
+    .scroll-list::-webkit-scrollbar-thumb {
+      background: var(--panel-hi);
+      border: 2px solid #11131f;
+    }
+
+    .item-card {
+      background: var(--panel-dark);
+      padding: 9px 11px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-card.locked-act {
+      opacity: 0.45;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .item-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9.5px;
+      color: var(--text-light);
+    }
+
+    .item-count {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: var(--bg-deep);
+      color: var(--accent-gold);
+      padding: 2px 6px;
+      box-shadow: 0 0 0 2px var(--border-black);
+    }
+
+    .item-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .item-stats {
+      font-size: 17px;
+      color: var(--accent-green-hi);
+    }
+
+    .buy-btn {
+      min-width: 128px;
+      flex-direction: column;
+      padding: 8px 8px;
+      font-size: 9px;
+    }
+
+    /* Right Column Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8.5px;
+      padding: 7px 8px;
+      background: var(--panel-dark);
+      color: var(--text-muted);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px var(--border-black);
+      flex: 1;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-gold);
+      color: var(--bg-dark);
+    }
+
+    .upgrade-card {
+      background: var(--panel-dark);
+      padding: 9px 11px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .upgrade-card.purchased {
+      border-left: 5px solid var(--accent-green);
+      opacity: 0.72;
+    }
+
+    .upgrade-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .satire-quote {
+      font-style: italic;
+      color: var(--accent-gold);
+      font-size: 18px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px 7px;
+      border-left: 3px solid var(--accent-red);
+    }
+
+    /* Event Log Feed */
+    .log-entry {
+      background: #14172b;
+      padding: 7px 9px;
+      border-left: 4px solid var(--accent-cyan);
+      font-size: 18px;
+    }
+
+    .log-entry.crisis {
+      border-left-color: var(--accent-red);
+    }
+
+    .log-entry.triumph {
+      border-left-color: var(--accent-green);
+    }
+
+    .log-time {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7.5px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Floating Popups */
+    .float-text {
+      position: fixed;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      pointer-events: none;
+      z-index: 9000;
+      text-shadow: 2px 2px 0 #000;
+      animation: floatUp 0.95s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-42px) scale(1.08); }
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 11, 18, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 5000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-window {
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .newspaper-header {
+      background: var(--text-light);
+      color: var(--bg-dark);
+      padding: 8px 12px;
+      text-align: center;
+      margin-bottom: 12px;
+      box-shadow: 0 0 0 3px var(--border-black);
+    }
+
+    .newspaper-mast {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .newspaper-sub {
+      font-size: 17px;
+      border-top: 2px solid var(--bg-dark);
+      padding-top: 2px;
+    }
+
+    .choice-btn {
+      width: 100%;
+      text-align: left;
+      justify-content: flex-start;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    textarea.save-box {
+      width: 100%;
+      height: 90px;
+      background: #0c0d14;
+      color: var(--accent-green-hi);
+      font-family: monospace;
+      font-size: 12px;
+      padding: 8px;
+      border: 3px solid var(--border-black);
+      resize: vertical;
+    }
+
+    .ending-card {
+      background: #14172b;
+      padding: 10px;
+      margin-bottom: 8px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+    }
+
+    .ending-card.unlocked {
+      border-left: 5px solid var(--accent-gold);
+    }
+
+    .modifier-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #14172b;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      box-shadow: inset 0 0 0 2px var(--border-black);
+      gap: 10px;
+    }
+  </style>
+</head>
+<body class="crt-enabled">
+
+  <!-- TOP HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-flag">★</div>
+      <div>
+        <h1>COMUNE: 8-BIT REVOLUTION</h1>
+        <div style="margin-top:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span class="act-badge" id="headerActBadge">ATTO I: QUARTIERE</span>
+          <span class="act-badge" style="background:#29366f;" id="headerWaveBadge">ONDA #1</span>
+          <span class="act-badge" style="background:#38b764; color:#0c1810;" id="headerMemoryBadge">📚 0 MEMORIA</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button class="pixel-btn btn-gold" id="btnOpenPrestige" onclick="openPrestigeModal()">🌊 ONDA STORICA</button>
+      <button class="pixel-btn btn-dark" onclick="openStatsModal()">📊 ARCHIVIO & FINALI</button>
+      <button class="pixel-btn btn-dark" onclick="openSaveModal()">💾 SALVATAGGIO</button>
+      <button class="pixel-btn btn-dark" id="btnCrt" onclick="toggleCrt()">📺 CRT: ON</button>
+      <button class="pixel-btn btn-dark" id="btnAudio" onclick="toggleAudio()">🔊 AUDIO: ON</button>
+    </div>
+  </header>
+
+  <!-- RETRO NEWSPAPER TICKER -->
+  <div class="ticker-bar">
+    <span class="ticker-label">ULTIM'ORA</span>
+    <div class="ticker-text" id="tickerText">
+      Il padrone dice che "siamo una grande famiglia", ma i dividendi restano solo suoi. Il quartiere inizia a organizzarsi...
+    </div>
+  </div>
+
+  <!-- MAIN 3-COLUMN WORKSPACE -->
+  <main class="main-grid">
+
+    <!-- LEFT COLUMN: VISUAL SCENE, RESOURCES & DIRECT ACTIONS -->
+    <section class="pixel-box" style="padding:12px;">
+      <h2 class="section-title">
+        <span>🚩 PIAZZA & RISORSE</span>
+        <span id="clockDisplay" style="font-size:9px; color:var(--text-muted);">GIORNO 1</span>
+      </h2>
+
+      <!-- Animated Pixel Art Scene -->
+      <div class="canvas-wrapper" onclick="manualLeaflet(event)" title="Clicca la piazza per fare volantinaggio!">
+        <canvas id="worldCanvas" width="320" height="110"></canvas>
+        <div class="canvas-caption">
+          <span id="sceneTitle">Garage Occupato "La Scintilla"</span>
+          <span style="color:var(--accent-cyan);">[CLICCA LA SCENA]</span>
+        </div>
+      </div>
+
+      <!-- Primary Currencies -->
+      <div class="res-grid">
+        <div class="res-card">
+          <div class="res-name"><span>🧠 COSCIENZA</span></div>
+          <div class="res-val" id="resConsciousness">0</div>
+          <div class="res-rate" id="rateConsciousness">+0.0 /s</div>
+        </div>
+        <div class="res-card">
+          <div class="res-name"><span>🤝 MUTUO SOCCORSO</span></div>
+          <div class="res-val" id="resSolidarity">0</div>
+          <div class="res-rate" id="rateSolidarity">+0.0 /s</div>
+        </div>
+      </div>
+
+      <!-- Burnout Warning -->
+      <div class="burnout-banner" id="burnoutBanner">
+        ⚠️ BURNOUT COLLETTIVO! PRODUZIONE DIMEZZATA! ORGANIZZARE RIPOSO!
+      </div>
+
+      <!-- Energia Vitale Bar -->
+      <div class="meter-box">
+        <div class="meter-header">
+          <span>⚡ ENERGIA VITALE</span>
+          <span id="energyText">100 / 100 (+0.5/s)</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill bar-energy" id="energyBar" style="width:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Indice di Sfruttamento Bar -->
+      <div class="meter-box">
+        <div class="meter-header">
+          <span style="color:var(--accent-red-hi);">🏭 INDICE SFRUTTAMENTO</span>
+          <span id="exploitText">35.0% (+0.15%/s)</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill bar-exploit" id="exploitBar" style="width:35%;"></div>
+        </div>
+      </div>
+
+      <!-- Core Player Buttons -->
+      <div class="action-stack">
+        <button class="pixel-btn main-click-btn" id="btnLeaflet" onclick="manualLeaflet(event)">
+          <span>📢 FAI VOLANTINAGGIO / DISCUTI</span>
+          <span class="btn-subtext" id="leafletSub">+1.0 🧠 | Costa 1.5 ⚡</span>
+        </button>
+
+        <div class="action-row">
+          <button class="pixel-btn btn-green" id="btnRest" onclick="collectiveRest(event)">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <span>🛌 RIPOSO COLLETTIVO</span>
+              <span class="btn-subtext" id="restSub">+35 ⚡ (Cura Burnout)</span>
+            </div>
+          </button>
+
+          <button class="pixel-btn btn-red" id="btnStrike" onclick="directStrike(event)">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <span>✊ SCIOPERO / AZIONE</span>
+              <span class="btn-subtext" id="strikeSub">-8% 🏭 | 25 🤝 + 12 ⚡</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Act Progression Card -->
+      <div class="act-card" style="margin-top:12px; margin-bottom:0;">
+        <div class="act-title" id="actCardTitle">ATTO I: IL RISVEGLIO NEL QUARTIERE</div>
+        <div class="act-desc" id="actCardDesc">
+          Dalle cucine popolari ai gruppi d'acquisto: trasformare il disagio individuale in forza collettiva.
+        </div>
+        <button class="pixel-btn btn-gold" style="width:100%;" id="btnAdvanceAct" onclick="advanceAct()">
+          AVANZA ALL'ATTO II
+        </button>
+      </div>
+    </section>
+
+    <!-- CENTER COLUMN: STRUCTURES & COMMUNITY PRACTICES -->
+    <section class="pixel-box" style="padding:12px;">
+      <h2 class="section-title">
+        <span>🏘️ PRATICHE E STRUTTURE DI BASE</span>
+        <span style="font-size:9px; color:var(--accent-green-hi);" id="globalMultBadge">MOLT: 1.00x</span>
+      </h2>
+      <div class="scroll-list" id="structuresList"></div>
+    </section>
+
+    <!-- RIGHT COLUMN: IDEAS TREE, DOCTRINES & CHRONICLE -->
+    <section class="pixel-box col-right" style="padding:12px;">
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tabBtnIdeas" onclick="switchRightTab('ideas')">💡 IDEE (<span id="ideasCount">0/24</span>)</button>
+        <button class="tab-btn" id="tabBtnDoctrines" onclick="switchRightTab('doctrines')">📚 DOTTRINE</button>
+        <button class="tab-btn" id="tabBtnLog" onclick="switchRightTab('log')">📰 CRONACA</button>
+      </div>
+
+      <div id="rightPanelIdeas" class="scroll-list"></div>
+      <div id="rightPanelDoctrines" class="scroll-list" style="display:none;"></div>
+      <div id="rightPanelLog" class="scroll-list" style="display:none;"></div>
+    </section>
+
+  </main>
+
+  <!-- DILEMMA / NEWSPAPER EVENT MODAL -->
+  <div class="modal-backdrop" id="eventModal">
+    <div class="modal-window pixel-box">
+      <div class="newspaper-header">
+        <div class="newspaper-mast">LA VOCE DEL QUARTIERE — EDIZIONE STRAORDINARIA</div>
+        <div class="newspaper-sub" id="eventMeta">CRONACA DI LOTTA • CONTRADDIZIONE DEL SISTEMA</div>
+      </div>
+      <h3 style="font-size:12px; color:var(--accent-gold); margin:0 0 8px 0; line-height:1.5;" id="eventTitle">Titolo Evento</h3>
+      <p style="font-size:21px; margin:0 0 14px 0; color:var(--text-light);" id="eventDesc">Descrizione...</p>
+      <div id="eventChoices"></div>
+    </div>
+  </div>
+
+  <!-- PRESTIGE ("NUOVA ONDA STORICA") MODAL -->
+  <div class="modal-backdrop" id="prestigeModal">
+    <div class="modal-window pixel-box">
+      <h2 class="section-title">
+        <span>🌊 NUOVA ONDA STORICA (PRESTIGIO)</span>
+        <button class="pixel-btn btn-red" style="padding:4px 8px; font-size:9px;" onclick="closeModal('prestigeModal')">X</button>
+      </h2>
+      <p style="font-size:20px; margin-top:0;">
+        Quando un movimento raggiunge la transizione post-capitalista (<strong>Atto IV</strong>, Sfruttamento &le; <strong>10%</strong>, Coscienza &ge; <strong>150.000</strong>, Mutuo Soccorso &ge; <strong>80.000</strong>), può esportare la propria esperienza in una nuova epoca o regione, convertendo le conquiste in <strong>Memoria Storica (📚)</strong>.
+      </p>
+
+      <div class="pixel-box-dark" style="padding:10px; margin:10px 0;">
+        <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--accent-gold); margin-bottom:6px;">
+          RICOMPENSA PREVISTA QUESTA RUN: <span id="prestigeGainPreview">0</span> 📚
+        </div>
+        <div style="font-size:19px; color:var(--text-muted);" id="prestigeReqStatus">
+          Stato requisiti...
+        </div>
+      </div>
+
+      <h3 style="font-size:10px; color:var(--accent-cyan); margin:12px 0 6px 0;">
+        ⚔️ MODIFICATORI DI SFIDA (ATTIVI NELLA PROSSIMA ONDA)
+      </h3>
+      <div id="modifiersList"></div>
+
+      <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+        <button class="pixel-btn btn-gold" style="flex:1;" id="btnTriggerPrestige" onclick="triggerPrestige()">
+          ✨ INIZIA NUOVA ONDA STORICA
+        </button>
+        <button class="pixel-btn btn-dark" onclick="closeModal('prestigeModal')">CHIUDI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS & ENDINGS ARCHIVE MODAL -->
+  <div class="modal-backdrop" id="statsModal">
+    <div class="modal-window pixel-box">
+      <h2 class="section-title">
+        <span>📊 ARCHIVIO STORICO & FINALI</span>
+        <button class="pixel-btn btn-red" style="padding:4px 8px; font-size:9px;" onclick="closeModal('statsModal')">X</button>
+      </h2>
+      <div id="statsSummary" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;"></div>
+      <h3 style="font-size:10px; color:var(--accent-gold); margin:10px 0 8px 0;">🏆 FINALI SBLOCCABILI (4 ORIZZONTI)</h3>
+      <div id="endingsList"></div>
+    </div>
+  </div>
+
+  <!-- SAVE / EXPORT / IMPORT MODAL -->
+  <div class="modal-backdrop" id="saveModal">
+    <div class="modal-window pixel-box">
+      <h2 class="section-title">
+        <span>💾 GESTIONE SALVATAGGIO (BASE64)</span>
+        <button class="pixel-btn btn-red" style="padding:4px 8px; font-size:9px;" onclick="closeModal('saveModal')">X</button>
+      </h2>
+      <p style="font-size:19px; margin-top:0;">
+        Il gioco salva automaticamente ogni 10 secondi in <code>localStorage</code> e calcola i progressi offline alla riapertura.
+      </p>
+      <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+        <button class="pixel-btn btn-green" onclick="manualSaveNow()">💾 SALVA ORA</button>
+        <button class="pixel-btn" onclick="exportSaveBase64()">📤 ESPORTA STRINGA</button>
+        <button class="pixel-btn btn-gold" onclick="importSaveBase64()">📥 IMPORTA STRINGA</button>
+        <button class="pixel-btn btn-red" onclick="hardResetGame()">🧨 RESET TOTALE</button>
+      </div>
+      <textarea class="save-box" id="saveBase64Area" placeholder="Clicca 'Esporta Stringa' per ottenere il codice Base64 del salvataggio, oppure incolla qui un salvataggio e clicca 'Importa Stringa'..."></textarea>
+      <div id="saveFeedback" style="font-size:18px; color:var(--accent-gold); margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <!-- OFFLINE PROGRESS / ENDING ANNOUNCEMENT MODAL -->
+  <div class="modal-backdrop" id="infoModal">
+    <div class="modal-window pixel-box">
+      <div class="newspaper-header">
+        <div class="newspaper-mast" id="infoModalMast">BOLLETTINO DEL COLLETTIVO</div>
+        <div class="newspaper-sub" id="infoModalSub">AGGIORNAMENTO STORICO</div>
+      </div>
+      <div id="infoModalBody" style="font-size:20px; margin-bottom:14px;"></div>
+      <button class="pixel-btn btn-gold" style="width:100%;" onclick="closeModal('infoModal')">AVANTI, COMPAGNI!</button>
+    </div>
+  </div>
+
+<script>
+/* ============================================================================
+   COMUNE: 8-BIT REVOLUTION — COMPLETE GAME ENGINE
+   ============================================================================ */
+
+// --- 1. WEB AUDIO API 8-BIT SYNTHESIZER ---
+const SoundFX = {
+  ctx: null,
+  enabled: true,
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  },
+  playTone(freq, type, duration, vol = 0.08, delay = 0) {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime + delay;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(vol, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration);
+  },
+  click() {
+    const jitter = (Math.random() - 0.5) * 40;
+    this.playTone(440 + jitter, 'square', 0.06, 0.06);
+  },
+  buy() {
+    this.playTone(523.25, 'square', 0.08, 0.07, 0);
+    this.playTone(783.99, 'square', 0.12, 0.07, 0.07);
+  },
+  rest() {
+    this.playTone(349.23, 'triangle', 0.18, 0.09, 0);
+    this.playTone(440.00, 'triangle', 0.18, 0.09, 0.09);
+    this.playTone(523.25, 'triangle', 0.25, 0.09, 0.18);
+  },
+  strike() {
+    this.playTone(196.00, 'sawtooth', 0.1, 0.08, 0);
+    this.playTone(261.63, 'square', 0.14, 0.08, 0.08);
+  },
+  alert() {
+    this.playTone(659.25, 'square', 0.1, 0.08, 0);
+    this.playTone(493.88, 'square', 0.1, 0.08, 0.11);
+    this.playTone(659.25, 'square', 0.14, 0.08, 0.22);
+  },
+  actUp() {
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    notes.forEach((n, i) => this.playTone(n, 'square', 0.14, 0.08, i * 0.09));
+  },
+  burnout() {
+    this.playTone(196.00, 'sawtooth', 0.18, 0.09, 0);
+    this.playTone(146.83, 'sawtooth', 0.22, 0.09, 0.15);
+    this.playTone(110.00, 'sawtooth', 0.30, 0.09, 0.32);
+  },
+  prestige() {
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((n, i) => this.playTone(n, 'triangle', 0.16, 0.09, i * 0.08));
+  }
+};
+
+// --- 2. STATIC GAME DATA: ACTS, STRUCTURES, 24 UPGRADES, 14 EVENTS, DOCTRINES, MODIFIERS, ENDINGS ---
+
+const ACTS = [
+  {
+    id: 1,
+    badge: "ATTO I: QUARTIERE",
+    title: "ATTO I: IL RISVEGLIO NEL QUARTIERE",
+    scene: "Garage Occupato 'La Scintilla'",
+    desc: "Dalle cucine popolari ai gruppi d'acquisto: trasformare la solitudine della precarietà in forza collettiva.",
+    reqC: 600,
+    reqS: 300,
+    reqMaxExploit: 55
+  },
+  {
+    id: 2,
+    badge: "ATTO II: ORGANIZZAZIONE",
+    title: "ATTO II: ORGANIZZAZIONE DI BASE",
+    scene: "Casa del Popolo & Radio Libera",
+    desc: "Sindacati conflittuali, casse di resistenza e case occupate: il quartiere diventa una trincea solidale.",
+    reqC: 8500,
+    reqS: 4500,
+    reqMaxExploit: 45
+  },
+  {
+    id: 3,
+    badge: "ATTO III: CONTROPOTERE",
+    title: "ATTO III: CONTROPOTERE E SCIOPERO GENERALE",
+    scene: "Fabbrica Riconvertita & Blocco Merci",
+    desc: "Bloccare la logistica del profitto, espropriare i brevetti essenziali e riconvertire l'industria in chiave ecologica.",
+    reqC: 75000,
+    reqS: 40000,
+    reqMaxExploit: 30
+  },
+  {
+    id: 4,
+    badge: "ATTO IV: POST-CAPITALISMO",
+    title: "ATTO IV: TRANSIZIONE POST-CAPITALISTA",
+    scene: "Comune Solare & Orti Urbani Liberati",
+    desc: "Settimana di 15 ore, abolizione della rendita, automazione liberata dal profitto e democrazia diretta.",
+    reqC: Infinity,
+    reqS: Infinity,
+    reqMaxExploit: 0
+  }
+];
+
+const STRUCTURES_DATA = [
+  // ACT I
+  {
+    id: "gas",
+    act: 1,
+    name: "Gruppo d'Acquisto Solidale (GAS)",
+    desc: "Filiera corta senza intermediari né GDO: cibo sano a prezzo giusto.",
+    baseCostC: 15,
+    baseCostS: 0,
+    costScale: 1.15,
+    prodC: 0.4,
+    prodS: 0.8,
+    prodE: 0.05,
+    exploitDelta: -0.005
+  },
+  {
+    id: "doposcuola",
+    act: 1,
+    name: "Doposcuola Popolare",
+    desc: "Istruzione critica gratuita dove si smontano i manuali di economia neoliberista.",
+    baseCostC: 45,
+    baseCostS: 20,
+    costScale: 1.16,
+    prodC: 1.4,
+    prodS: 0.6,
+    prodE: 0.05,
+    exploitDelta: -0.008
+  },
+  {
+    id: "ciclofficina",
+    act: 1,
+    name: "Ciclofficina & Riparazioni",
+    desc: "Chiavi inglesi condivise contro la cultura dell'usa-e-getta.",
+    baseCostC: 110,
+    baseCostS: 65,
+    costScale: 1.16,
+    prodC: 1.2,
+    prodS: 2.4,
+    prodE: 0.08,
+    exploitDelta: -0.012
+  },
+  {
+    id: "sportello_casa",
+    act: 1,
+    name: "Sportello Anti-Sfratto",
+    desc: "Picchetti antisfratto e mutua difesa contro i fondi immobiliari.",
+    baseCostC: 240,
+    baseCostS: 140,
+    costScale: 1.17,
+    prodC: 2.8,
+    prodS: 3.0,
+    prodE: 0.12,
+    exploitDelta: -0.022
+  },
+
+  // ACT II
+  {
+    id: "sindacato",
+    act: 2,
+    name: "Sindacato Conflittuale di Base",
+    desc: "Niente concertazione al ribasso: assemblee dei lavoratori e scioperi veri.",
+    baseCostC: 650,
+    baseCostS: 350,
+    costScale: 1.17,
+    prodC: 8.5,
+    prodS: 5.0,
+    prodE: 0.10,
+    exploitDelta: -0.038
+  },
+  {
+    id: "cassa_resistenza",
+    act: 2,
+    name: "Cassa di Resistenza",
+    desc: "Sostegno economico collettivo perché nessuno debba cedere per fame durante uno sciopero.",
+    baseCostC: 1400,
+    baseCostS: 900,
+    costScale: 1.18,
+    prodC: 6.0,
+    prodS: 16.0,
+    prodE: 0.15,
+    exploitDelta: -0.032
+  },
+  {
+    id: "casa_occupata",
+    act: 2,
+    name: "Immobile Sfitto Recuperato",
+    desc: "Da rudere speculativo a condominio solidale con mensa e consultorio.",
+    baseCostC: 2900,
+    baseCostS: 1800,
+    costScale: 1.18,
+    prodC: 14.0,
+    prodS: 24.0,
+    prodE: 0.25,
+    exploitDelta: -0.048
+  },
+  {
+    id: "radio_libera",
+    act: 2,
+    name: "Redazione & Radio Indipendente",
+    desc: "Contro-informazione senza editori miliardari né clickbait.",
+    baseCostC: 5500,
+    baseCostS: 3200,
+    costScale: 1.18,
+    prodC: 32.0,
+    prodS: 18.0,
+    prodE: 0.15,
+    exploitDelta: -0.060
+  },
+
+  // ACT III
+  {
+    id: "blocco_logistica",
+    act: 3,
+    name: "Nodo di Blocco Logistica",
+    desc: "Fermare i cancelli dei magazzini colpisce il Capitale dove fa più male: nella circolazione.",
+    baseCostC: 12000,
+    baseCostS: 7500,
+    costScale: 1.19,
+    prodC: 68.0,
+    prodS: 52.0,
+    prodE: 0.18,
+    exploitDelta: -0.095
+  },
+  {
+    id: "fabbrica_ecologica",
+    act: 3,
+    name: "Fabbrica Riconvertita (Ecologica)",
+    desc: "Ex stabilimento inquinante occupato e convertito a produrre pompe di calore e treni.",
+    baseCostC: 26000,
+    baseCostS: 16000,
+    costScale: 1.19,
+    prodC: 110.0,
+    prodS: 145.0,
+    prodE: 0.30,
+    exploitDelta: -0.110
+  },
+  {
+    id: "brevetti_aperti",
+    act: 3,
+    name: "Lab Brevetti Open-Source",
+    desc: "Farmaci salvavita e software liberati dal recinto della proprietà intellettuale.",
+    baseCostC: 52000,
+    baseCostS: 30000,
+    costScale: 1.20,
+    prodC: 240.0,
+    prodS: 210.0,
+    prodE: 0.35,
+    exploitDelta: -0.130
+  },
+  {
+    id: "rete_energetica",
+    act: 3,
+    name: "Comunità Energetica Solare",
+    desc: "Tetti fotovoltaici condivisi: bollette azzerate e blackout sconfitti.",
+    baseCostC: 95000,
+    baseCostS: 58000,
+    costScale: 1.20,
+    prodC: 320.0,
+    prodS: 420.0,
+    prodE: 0.65,
+    exploitDelta: -0.150
+  },
+
+  // ACT IV
+  {
+    id: "democrazia_diretta",
+    act: 4,
+    name: "Assemblea di Democrazia Diretta",
+    desc: "Decisioni revocabili dal basso: la politica torna nelle mani di chi vive il territorio.",
+    baseCostC: 180000,
+    baseCostS: 110000,
+    costScale: 1.21,
+    prodC: 850.0,
+    prodS: 680.0,
+    prodE: 0.60,
+    exploitDelta: -0.220
+  },
+  {
+    id: "automazione_liberata",
+    act: 4,
+    name: "Automazione Liberata dal Profitto",
+    desc: "I robot fanno i lavori usuranti; gli esseri umani si godono il tempo liberato.",
+    baseCostC: 340000,
+    baseCostS: 220000,
+    costScale: 1.21,
+    prodC: 1200.0,
+    prodS: 1650.0,
+    prodE: 0.90,
+    exploitDelta: -0.260
+  },
+  {
+    id: "abolizione_rendita",
+    act: 4,
+    name: "Fondo Abolizione della Rendita",
+    desc: "La casa e la terra diventano beni comuni inalienabili: fine dei parassiti immobiliari.",
+    baseCostC: 620000,
+    baseCostS: 400000,
+    costScale: 1.22,
+    prodC: 2400.0,
+    prodS: 2600.0,
+    prodE: 1.10,
+    exploitDelta: -0.350
+  },
+  {
+    id: "istituto_ozio",
+    act: 4,
+    name: "Istituto dell'Ozio Creativo (15h)",
+    desc: "15 ore settimanali di lavoro socialmente necessario; il resto è arte, cura, scienza e riposo.",
+    baseCostC: 1100000,
+    baseCostS: 750000,
+    costScale: 1.22,
+    prodC: 4800.0,
+    prodS: 4800.0,
+    prodE: 2.00,
+    exploitDelta: -0.450
+  }
+];
+
+// 24 Satirical Upgrades ("Albero delle Idee e Pratiche")
+const UPGRADES_DATA = [
+  {
+    id: "u_famiglia",
+    act: 1,
+    name: "Decodifica del 'Siamo una Famiglia'",
+    quote: "«Qui siamo una grande famiglia!» — Traduzione: preparati a fare straordinari gratis.",
+    effectDesc: "Raddoppia (2x) la Coscienza ottenuta cliccando Volantinaggio.",
+    costC: 35, costS: 0
+  },
+  {
+    id: "u_trasparenza",
+    act: 1,
+    name: "Trasparenza Salariale Totale",
+    quote: "Il segreto salariale serve solo a pagare meno chi non osa chiedere.",
+    effectDesc: "+45% Coscienza Critica da tutte le strutture.",
+    costC: 90, costS: 30
+  },
+  {
+    id: "u_straordinari",
+    act: 1,
+    name: "Rifiuto degli Straordinari Non Pagati",
+    quote: "Alle 18:00 cade la penna. Il tempo di vita non è in saldo.",
+    effectDesc: "+25 Energia Max e +0.4 ⚡/s rigenerazione.",
+    costC: 160, costS: 80
+  },
+  {
+    id: "u_obsolescenza",
+    act: 1,
+    name: "Sabotaggio dell'Obsolescenza Programmata",
+    quote: "Schemi liberi e stampanti 3D: la lavatrice durerà altri vent'anni.",
+    effectDesc: "GAS e Ciclofficina producono +85% Mutuo Soccorso.",
+    costC: 280, costS: 160
+  },
+  {
+    id: "u_merito",
+    act: 1,
+    name: "Autopsia del 'Merito' Ereditario",
+    quote: "Nascere in terza base e credere di aver fatto fuoricampo.",
+    effectDesc: "+50% Coscienza Critica globale.",
+    costC: 420, costS: 200
+  },
+  {
+    id: "u_greenwashing",
+    act: 1,
+    name: "Smontaggio del Greenwashing",
+    quote: "Dipingere di verde una raffineria non assorbe una singola tonnellata di CO2.",
+    effectDesc: "-20% velocità di crescita dello Sfruttamento.",
+    costC: 550, costS: 260
+  },
+
+  // ACT II UPGRADES
+  {
+    id: "u_burnout_kit",
+    act: 2,
+    name: "Kit Anti-Burnout (Zero Mindfulness Aziendale)",
+    quote: "Non ci serve un'app di meditazione pagata dall'HR: ci servono turni umani.",
+    effectDesc: "+35 Energia Max e costo Energia dei click ridotto del 35%.",
+    costC: 1200, costS: 650
+  },
+  {
+    id: "u_mappa_sfitti",
+    act: 2,
+    name: "Catasto Popolare degli Sfitti",
+    quote: "Migliaia di case vuote in mano ai fondi mentre famiglie dormono in auto: ora abbiamo le chiavi.",
+    effectDesc: "Sportello Anti-Sfratto e Immobile Recuperato +90% output.",
+    costC: 2400, costS: 1400
+  },
+  {
+    id: "u_cassa_mutua",
+    act: 2,
+    name: "Mutua Senza Burocrazia",
+    quote: "Niente moduli in triplice copia: se hai bisogno, il quartiere risponde oggi.",
+    effectDesc: "+65% Mutuo Soccorso globale.",
+    costC: 3800, costS: 2200
+  },
+  {
+    id: "u_meme_warfare",
+    act: 2,
+    name: "Guerriglia Grafica & Contro-Pubblicità",
+    quote: "Sostituire i cartelloni dei SUV con i dati sugli extraprofitti bancari.",
+    effectDesc: "Click Volantinaggio +150% e +35% Coscienza globale.",
+    costC: 5400, costS: 2900
+  },
+  {
+    id: "u_whistleblower",
+    act: 2,
+    name: "Rete Crittografata Whistleblower",
+    quote: "I bilanci truccati e le delocalizzazioni finiscono in diretta su Radio Libera.",
+    effectDesc: "Sciopero/Azione Diretta riduce lo Sfruttamento di un ulteriore -5%.",
+    costC: 7200, costS: 4000
+  },
+  {
+    id: "u_capitale_umano",
+    act: 2,
+    name: "Abolizione del Termine 'Capitale Umano'",
+    quote: "Gli esseri umani non sono risorse minerarie da estrarre fino all'esaurimento.",
+    effectDesc: "+40% produzione globale (🧠 e 🤝).",
+    costC: 8200, costS: 4400
+  },
+
+  // ACT III UPGRADES
+  {
+    id: "u_algoritmi_open",
+    act: 3,
+    name: "Algoritmi Open-Source dei Rider",
+    quote: "Via la scatola nera che taglia le tariffe sotto la pioggia: ora il codice lo scriviamo noi.",
+    effectDesc: "Blocco Logistica e Fabbrica Riconvertita +100% output.",
+    costC: 16000, costS: 9500
+  },
+  {
+    id: "u_esproprio_brevetti",
+    act: 3,
+    name: "Dichiarazione dei Saperi Beni Comuni",
+    quote: "L'insulina costa 3 dollari da produrre e 300 al banco: fine del ricatto.",
+    effectDesc: "Lab Brevetti Open-Source +120% e +50% Mutuo Soccorso.",
+    costC: 28000, costS: 17000
+  },
+  {
+    id: "u_sciopero_consumi",
+    act: 3,
+    name: "Sciopero dei Consumi Superflui",
+    quote: "Quando smetti di comprare fumo, i colossi del lusso vanno in panico.",
+    effectDesc: "-25% velocità di crescita dello Sfruttamento.",
+    costC: 42000, costS: 24000
+  },
+  {
+    id: "u_assemblee_fabbrica",
+    act: 3,
+    name: "Consigli di Fabbrica e Territorio",
+    quote: "Chi manda avanti le macchine decide cosa, come e quanto produrre.",
+    effectDesc: "+60% Coscienza Critica globale.",
+    costC: 58000, costS: 32000
+  },
+  {
+    id: "u_riconversione_bellica",
+    act: 3,
+    name: "Riconversione Bellica in Micro-Reti",
+    quote: "Fondere i profitti degli armamenti per installare batterie comunitarie in ogni isolato.",
+    effectDesc: "+1.8 ⚡/s rigenerazione e Comunità Energetica +100%.",
+    costC: 68000, costS: 38000
+  },
+  {
+    id: "u_reddito_transizione",
+    act: 3,
+    name: "Reddito Incondizionato di Transizione",
+    quote: "Nessuno può più essere ricattato con la minaccia della miseria.",
+    effectDesc: "+40 Energia Max e zero stress passivo sotto il 75% di Sfruttamento.",
+    costC: 74000, costS: 39000
+  },
+
+  // ACT IV UPGRADES
+  {
+    id: "u_ozio_creativo",
+    act: 4,
+    name: "Manifesto del Diritto all'Ozio",
+    quote: "Paul Lafargue aveva ragione: la religione del lavoro salariato era una follia collettiva.",
+    effectDesc: "+85% produzione globale quando l'Energia Vitale è sopra il 75%.",
+    costC: 140000, costS: 85000
+  },
+  {
+    id: "u_15_ore",
+    act: 4,
+    name: "Settimana Lavorativa di 15 Ore",
+    quote: "Keynes la previde nel 1930: bastava cacciare i parassiti della rendita.",
+    effectDesc: "+4.0 ⚡/s rigenerazione e costo Energia del Volantinaggio = 0.",
+    costC: 260000, costS: 160000
+  },
+  {
+    id: "u_biblioteche_oggetti",
+    act: 4,
+    name: "Biblioteche Universali degli Oggetti",
+    quote: "Un trapano viene usato 12 minuti in tutta la vita: perché comprarne 10.000 per quartiere?",
+    effectDesc: "+110% Mutuo Soccorso globale.",
+    costC: 440000, costS: 280000
+  },
+  {
+    id: "u_no_assenteismo",
+    act: 4,
+    name: "Abolizione della Proprietà Assenteista",
+    quote: "La terra e le case appartengono a chi le abita e le cura.",
+    effectDesc: "-0.35%/s riduzione passiva costante dello Sfruttamento.",
+    costC: 680000, costS: 420000
+  },
+  {
+    id: "u_cibernetica_verde",
+    act: 4,
+    name: "Pianificazione Ecologica Cibernetica",
+    quote: "Sensori aperti e assemblee decidono i flussi materiali entro i limiti planetari.",
+    effectDesc: "+90% Coscienza e +90% Mutuo Soccorso.",
+    costC: 950000, costS: 600000
+  },
+  {
+    id: "u_post_scarsita",
+    act: 4,
+    name: "Orizzonte Post-Scarsità",
+    quote: "Da ciascuno secondo le proprie capacità, a ciascuno secondo i propri bisogni.",
+    effectDesc: "+150% a tutta la produzione del movimento.",
+    costC: 1400000, costS: 900000
+  }
+];
+
+// 14 Satirical Dilemma Events
+const EVENTS_DATA = [
+  {
+    id: "ev_crisis_washing",
+    minAct: 1,
+    meta: "MODA & MERCE • RECUPERO SIMBOLICO",
+    title: "CRISIS WASHING: SCARPE 'RIVOLUZIONE' A 190€",
+    desc: "Una multinazionale dell'abbigliamento lancia una linea street-wear copiando lo stencil del tuo circolo di quartiere. Lo spot mostra modelli ribelli che spaccano vetrine finte.",
+    choices: [
+      {
+        label: "Azione Diretta: Blitz davanti ai negozi e contro-etichette con i salari delle fabbriche",
+        effectText: "+120 🧠, -6% 🏭 Sfruttamento, -12 ⚡ | (+Radicalismo)",
+        apply(s) {
+          s.consciousness += 120 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 6);
+          s.energy = Math.max(5, s.energy - 12);
+          s.axes.radical += 1;
+        }
+      },
+      {
+        label: "Causa Legale Collettiva: Chiedere risarcimento per finanziare le casse mutualistiche",
+        effectText: "+150 🤝, +40 🧠, -2% 🏭 | (+Istituzionale)",
+        apply(s) {
+          s.solidarity += 150 * getActScale(s);
+          s.consciousness += 40 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 2);
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_caro_affitti",
+    minAct: 1,
+    meta: "EMERGENZA ABITATIVA • SPECULAZIONE",
+    title: "CARO AFFITTI: UN FONDO COMPRA MEZZO QUARTIERE",
+    desc: "Il fondo 'Aurelia Capital' acquisisce tre palazzine popolari per trasformarle in B&B di lusso. Arrivano venti lettere di sfratto per finita locazione.",
+    choices: [
+      {
+        label: "Picchetto Antisfratto Permanente & Autoriduzione degli Affitti",
+        effectText: "-9% 🏭 Sfruttamento, +90 🤝, -15 ⚡ | (+Radicalismo, +Ecologia)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 9);
+          s.solidarity += 90 * getActScale(s);
+          s.energy = Math.max(5, s.energy - 15);
+          s.axes.radical += 1;
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Proposta di Delibera Comunale sul Canone Concordato Obbligatorio",
+        effectText: "+140 🧠, -4% 🏭 Sfruttamento | (+Istituzionale)",
+        apply(s) {
+          s.consciousness += 140 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 4);
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_gentrificazione",
+    minAct: 1,
+    meta: "URBANISTICA • TURISTIFICAZIONE",
+    title: "GENTRIFICAZIONE BOHEMIEN: TOAST ARTIGIANALI A 14€",
+    desc: "Una rivista patinata definisce il vostro quartiere 'il nuovo distretto creativo autentico'. Aprono locali minimalisti mentre chiudono la panetteria storica e il calzolaio.",
+    choices: [
+      {
+        label: "Mappa della Speculazione & Boicottaggio delle Catene Turistiche",
+        effectText: "+110 🧠, +80 🤝, -5% 🏭 | (+Ecologia)",
+        apply(s) {
+          s.consciousness += 110 * getActScale(s);
+          s.solidarity += 80 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 5);
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Cooperativa di Quartiere per Rilevare i Negozi Storici",
+        effectText: "+180 🤝, +15 ⚡ Energia Max | (+Istituzionale)",
+        apply(s) {
+          s.solidarity += 180 * getActScale(s);
+          s.bonusMaxEnergy += 10;
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_automazione_licenziamenti",
+    minAct: 2,
+    meta: "LAVORO & TECNOLOGIA • PROFITTO",
+    title: "AUTOMAZIONE E LICENZIAMENTI AL POLO LOGISTICO",
+    desc: "L'azienda annuncia 180 esuberi sostituendo i magazzinieri con robot autonomi. Il titolo in borsa sale del 14% in un'ora.",
+    choices: [
+      {
+        label: "Occupazione del Magazzino: 'Ridurre l'orario a parità di salario, non i posti!'",
+        effectText: "-10% 🏭 Sfruttamento, +250 🧠, -18 ⚡ | (+Radicalismo, +Tecno)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 10);
+          s.consciousness += 250 * getActScale(s);
+          s.energy = Math.max(5, s.energy - 18);
+          s.axes.radical += 1;
+          s.axes.techno += 1;
+        }
+      },
+      {
+        label: "Tassa sui Robot per Finanziare la Cassa Mutualistica Territoriale",
+        effectText: "+320 🤝, -4% 🏭 | (+Istituzionale, +Tecno)",
+        apply(s) {
+          s.solidarity += 320 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 4);
+          s.axes.institutional += 1;
+          s.axes.techno += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_blackout_energia",
+    minAct: 2,
+    meta: "CLIMA & INFRASTRUTTURE • EXTRAPROFITTI",
+    title: "ONDATA DI CALORE E STANGATA ENERGETICA",
+    desc: "Le compagnie elettriche triplicano le tariffe durante un'ondata di calore record, mentre i centri commerciali restano refrigerati a 18 gradi.",
+    choices: [
+      {
+        label: "Riallacci Solidali & Apertura di Rifugi Climatici Popolari",
+        effectText: "+260 🤝, +20 ⚡, -6% 🏭 | (+Radicalismo, +Ecologia)",
+        apply(s) {
+          s.solidarity += 260 * getActScale(s);
+          s.energy = Math.min(getMaxEnergy(), s.energy + 20);
+          s.exploitation = Math.max(0, s.exploitation - 6);
+          s.axes.radical += 1;
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Campagna per la Ripubblicizzazione della Rete Elettrica",
+        effectText: "+340 🧠, -4% 🏭 | (+Istituzionale, +Ecologia)",
+        apply(s) {
+          s.consciousness += 340 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 4);
+          s.axes.institutional += 1;
+          s.axes.ecology += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_tavolo_comune",
+    minAct: 2,
+    meta: "POLITICA LOCALE • COOPTAZIONE",
+    title: "IL SINDACO OFFRE UN 'TAVOLO DI ASCOLTO' SIMBOLICO",
+    desc: "L'amministrazione propone un posto in una commissione consultiva senza potere di veto, in cambio della revoca dello sciopero cittadino di sabato.",
+    choices: [
+      {
+        label: "Rifiutare la Trappola: Confermare la Piazza e l'Assemblea Pubblica",
+        effectText: "+300 🧠, -8% 🏭 Sfruttamento, -10 ⚡ | (+Radicalismo)",
+        apply(s) {
+          s.consciousness += 300 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 8);
+          s.energy = Math.max(5, s.energy - 10);
+          s.axes.radical += 1;
+        }
+      },
+      {
+        label: "Partecipare con Mandato Imperativo e Diretta Streaming delle Sedute",
+        effectText: "+240 🤝, +150 🧠, -3% 🏭 | (+Istituzionale)",
+        apply(s) {
+          s.solidarity += 240 * getActScale(s);
+          s.consciousness += 150 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 3);
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_bando_filantropia",
+    minAct: 2,
+    meta: "TERZO SETTORE • BUROCRAZIA",
+    title: "BANDO DELLA FONDAZIONE BANCARIA: 50.000€ CON CLAUSOLA",
+    desc: "Una fondazione bancaria offre fondi per il doposcuola, ma pretende il logo sulle magliette, 80 pagine di KPI e il divieto di criticare gli istituti di credito.",
+    choices: [
+      {
+        label: "Stracciare il Bando: Finanziarsi con Cene Popolari e Sottoscrizioni",
+        effectText: "+280 🧠, +180 🤝, +15 ⚡ | (+Radicalismo)",
+        apply(s) {
+          s.consciousness += 280 * getActScale(s);
+          s.solidarity += 180 * getActScale(s);
+          s.energy = Math.min(getMaxEnergy(), s.energy + 15);
+          s.axes.radical += 1;
+        }
+      },
+      {
+        label: "Imporre Regolamenti Comunali che Tassino le Banche Senza Condizioni",
+        effectText: "+350 🤝, -3% 🏭 | (+Istituzionale)",
+        apply(s) {
+          s.solidarity += 350 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 3);
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_riders_pioggia",
+    minAct: 2,
+    meta: "GIG ECONOMY • ALGORITMI",
+    title: "TEMPESTA IN CITTÀ: L'ALGORITMO TAGLIA LE TARIFFE AI RIDER",
+    desc: "Sotto il nubifragio, la piattaforma di delivery riduce il compenso base a 2,10€ a consegna contando sulla disperazione dei fattorini.",
+    choices: [
+      {
+        label: "Disconnessione Collettiva Immediata & Picchetto ai Ristoranti Hub",
+        effectText: "-9% 🏭 Sfruttamento, +260 🧠, +200 🤝 | (+Radicalismo, +Tecno)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 9);
+          s.consciousness += 260 * getActScale(s);
+          s.solidarity += 200 * getActScale(s);
+          s.axes.radical += 1;
+          s.axes.techno += 1;
+        }
+      },
+      {
+        label: "Lanciare una Piattaforma Cooperativa Gestita dai Rider Stessi",
+        effectText: "+420 🤝, +120 🧠 | (+Istituzionale, +Tecno)",
+        apply(s) {
+          s.solidarity += 420 * getActScale(s);
+          s.consciousness += 120 * getActScale(s);
+          s.axes.institutional += 1;
+          s.axes.techno += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_acqua_privata",
+    minAct: 3,
+    meta: "BENI COMUNI • PRIVATIZZAZIONI",
+    title: "HOLDING FINANZIARIA VUOLE QUOTARE L'ACQUEDOTTO IN BORSA",
+    desc: "Nonostante un referendum vinto anni fa, una multiutility prova a trasformare l'acqua potabile in dividendi per fondi esteri.",
+    choices: [
+      {
+        label: "Autoriduzione delle Bollette & Blocco delle Assemblee degli Azionisti",
+        effectText: "-11% 🏭 Sfruttamento, +600 🧠, -15 ⚡ | (+Radicalismo, +Ecologia)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 11);
+          s.consciousness += 600 * getActScale(s);
+          s.energy = Math.max(5, s.energy - 15);
+          s.axes.radical += 1;
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Azienda Speciale Pubblica con Controllo dei Comitati Cittadini",
+        effectText: "+750 🤝, -5% 🏭 | (+Istituzionale, +Ecologia)",
+        apply(s) {
+          s.solidarity += 750 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 5);
+          s.axes.institutional += 1;
+          s.axes.ecology += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_fabbrica_delocalizza",
+    minAct: 3,
+    meta: "PRODUZIONE • LOTTA OPERAIA",
+    title: "I PADRONI SMONTANO I MACCHINARI DI NOTTE PER DELOCALIZZARE",
+    desc: "Dopo aver incassato milioni di incentivi pubblici, la proprietà manda camion notturni per svuotare lo stabilimento metalmeccanico.",
+    choices: [
+      {
+        label: "Presidio Permanente ai Cancelli & Riconversione Autogestita",
+        effectText: "-12% 🏭 Sfruttamento, +800 🤝, +500 🧠 | (+Radicalismo, +Tecno)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 12);
+          s.solidarity += 800 * getActScale(s);
+          s.consciousness += 500 * getActScale(s);
+          s.axes.radical += 1;
+          s.axes.techno += 1;
+        }
+      },
+      {
+        label: "Esproprio per Pubblica Utilità & Cooperativa Industriale Federata",
+        effectText: "+1100 🤝, -6% 🏭 | (+Istituzionale, +Tecno)",
+        apply(s) {
+          s.solidarity += 1100 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 6);
+          s.axes.institutional += 1;
+          s.axes.techno += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_fango_media",
+    minAct: 3,
+    meta: "EGEMONIA CULTURALE • PROPAGANDA",
+    title: "CAMPAGNA DIFFAMATORIA: 'I SOVVERSIVI CHE ODIONO IL PIL'",
+    desc: "Tre reti televisive dedicano speciali serali accusando le reti mutualistiche di 'minacciare la crescita economica e la fiducia dei mercati'.",
+    choices: [
+      {
+        label: "Contro-Festival Popolare in Piazza con Dati Reali su Salari e Clima",
+        effectText: "+950 🧠, +25 ⚡ Energia, -5% 🏭 | (+Ecologia)",
+        apply(s) {
+          s.consciousness += 950 * getActScale(s);
+          s.energy = Math.min(getMaxEnergy(), s.energy + 25);
+          s.exploitation = Math.max(0, s.exploitation - 5);
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Hackathon Civico: Portale Aperto che Smonta le Fake News Economiche",
+        effectText: "+850 🧠, +450 🤝, -4% 🏭 | (+Tecno)",
+        apply(s) {
+          s.consciousness += 850 * getActScale(s);
+          s.solidarity += 450 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 4);
+          s.axes.techno += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_consultorio_chiuso",
+    minAct: 2,
+    meta: "WELFARE • AUSTERITÀ",
+    title: "TAGLI AL CONSULTORIO E ALLA BIBLIOTECA RIONALE",
+    desc: "In nome del pareggio di bilancio si chiude il consultorio di quartiere mentre si finanziano grandi eventi privati.",
+    choices: [
+      {
+        label: "Riappropriazione dell'Edificio & Apertura del Consultorio Autogestito",
+        effectText: "+280 🤝, +180 🧠, +20 ⚡ | (+Radicalismo, +Ecologia)",
+        apply(s) {
+          s.solidarity += 280 * getActScale(s);
+          s.consciousness += 180 * getActScale(s);
+          s.energy = Math.min(getMaxEnergy(), s.energy + 20);
+          s.axes.radical += 1;
+          s.axes.ecology += 1;
+        }
+      },
+      {
+        label: "Bilancio Partecipativo Vincolante per Riassegnare i Fondi Pubblici",
+        effectText: "+320 🧠, +200 🤝, -4% 🏭 | (+Istituzionale)",
+        apply(s) {
+          s.consciousness += 320 * getActScale(s);
+          s.solidarity += 200 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 4);
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_assemblea_costituente",
+    minAct: 4,
+    meta: "TRANSIZIONE • ORIZZONTE STORICO",
+    title: "ASSEMBLEA COSTITUENTE DELLA COMUNE",
+    desc: "Il vecchio ordine scricchiola. Le assemblee territoriali si riuniscono per decidere il cuore della nuova società liberata dal profitto.",
+    choices: [
+      {
+        label: "Priorità alla Bio-Regione Conviviale: Orti, Foreste Urbane e Cura",
+        effectText: "+2500 🧠, +2500 🤝, +35 ⚡, -10% 🏭 | (+Ecologia, +Radicalismo)",
+        apply(s) {
+          s.consciousness += 2500 * getActScale(s);
+          s.solidarity += 2500 * getActScale(s);
+          s.energy = Math.min(getMaxEnergy(), s.energy + 35);
+          s.exploitation = Math.max(0, s.exploitation - 10);
+          s.axes.ecology += 2;
+          s.axes.radical += 1;
+        }
+      },
+      {
+        label: "Priorità all'Abbondanza Automatizzata Open-Source per Tutti",
+        effectText: "+3000 🤝, +2000 🧠, -10% 🏭 | (+Tecno, +Istituzionale)",
+        apply(s) {
+          s.solidarity += 3000 * getActScale(s);
+          s.consciousness += 2000 * getActScale(s);
+          s.exploitation = Math.max(0, s.exploitation - 10);
+          s.axes.techno += 2;
+          s.axes.institutional += 1;
+        }
+      }
+    ]
+  },
+  {
+    id: "ev_sciopero_generale_finale",
+    minAct: 4,
+    meta: "MOMENTO DECISIVO • FINE DELLA RENDITA",
+    title: "ULTIMO ASSALTO ALLA RENDITA FINANZIARIA",
+    desc: "I mercati finanziari tentano uno sciopero dei capitali. Peccato che i capitali non coltivino grano né riparino acquedotti.",
+    choices: [
+      {
+        label: "Esproprio dei Monopoli & Rete Federata delle Comuni",
+        effectText: "-15% 🏭 Sfruttamento, +3500 🧠, +3500 🤝 | (+Radicalismo)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 15);
+          s.consciousness += 3500 * getActScale(s);
+          s.solidarity += 3500 * getActScale(s);
+          s.axes.radical += 2;
+        }
+      },
+      {
+        label: "Statuto Costituzionale dei Beni Comuni e Democrazia Economica",
+        effectText: "-12% 🏭 Sfruttamento, +4000 🤝, +3000 🧠 | (+Istituzionale)",
+        apply(s) {
+          s.exploitation = Math.max(0, s.exploitation - 12);
+          s.solidarity += 4000 * getActScale(s);
+          s.consciousness += 3000 * getActScale(s);
+          s.axes.institutional += 2;
+        }
+      }
+    ]
+  }
+];
+
+function getActScale(s) {
+  return Math.pow(3.2, s.act - 1);
+}
+
+// Permanent Doctrines (Prestige Skill Tree)
+const DOCTRINES_DATA = [
+  {
+    id: "doc_archivio",
+    name: "Archivio delle Lotte Passate",
+    desc: "+25% Coscienza Critica globale per livello.",
+    baseCost: 2,
+    costStep: 2,
+    maxLvl: 10
+  },
+  {
+    id: "doc_mutua",
+    name: "Rete Solidale Transnazionale",
+    desc: "+25% Mutuo Soccorso globale per livello.",
+    baseCost: 2,
+    costStep: 2,
+    maxLvl: 10
+  },
+  {
+    id: "doc_cura",
+    name: "Cultura della Cura & Riposo",
+    desc: "+15 Energia Max e +0.3 ⚡/s rigenerazione per livello.",
+    baseCost: 3,
+    costStep: 2,
+    maxLvl: 8
+  },
+  {
+    id: "doc_barricate",
+    name: "Memoria delle Barricate",
+    desc: "-12% velocità crescita Sfruttamento per livello.",
+    baseCost: 3,
+    costStep: 3,
+    maxLvl: 6
+  },
+  {
+    id: "doc_prassi",
+    name: "Prassi dell'Azione Diretta",
+    desc: "+50% efficacia Volantinaggio e -2% extra Sfruttamento per Sciopero.",
+    baseCost: 3,
+    costStep: 3,
+    maxLvl: 6
+  },
+  {
+    id: "doc_avanguardia",
+    name: "Nucleo Organizzato di Partenza",
+    desc: "Inizi ogni Onda Storica con +150 🧠, +100 🤝 e 2 GAS già attivi per livello.",
+    baseCost: 4,
+    costStep: 4,
+    maxLvl: 5
+  },
+  {
+    id: "doc_accelerazione",
+    name: "Coscienza Storica Matura",
+    desc: "-15% requisiti per avanzare tra gli Atti I–III per livello.",
+    baseCost: 5,
+    costStep: 5,
+    maxLvl: 4
+  },
+  {
+    id: "doc_internazionale",
+    name: "Internazionalismo Post-Scarsità",
+    desc: "+40% Memoria Storica (📚) ottenuta completando un'Onda.",
+    baseCost: 6,
+    costStep: 6,
+    maxLvl: 5
+  }
+];
+
+// Challenge Modifiers for Prestige Runs
+const MODIFIERS_DATA = [
+  {
+    id: "mod_tecnofeudalesimo",
+    name: "Era del Tecno-Feudalesimo",
+    desc: "Le piattaforme estraggono rendita su ogni scambio: -25% 🤝 e click costano +40% ⚡.",
+    bonusPct: 50
+  },
+  {
+    id: "mod_clima",
+    name: "Crisi Climatica Accelerata",
+    desc: "Ondate di calore continue: Energia cala più in fretta e Sfruttamento sale +30% più veloce.",
+    bonusPct: 60
+  },
+  {
+    id: "mod_media",
+    name: "Monopolio Mediatico Totale",
+    desc: "Censura algoritmica: -25% 🧠 e Sfruttamento sale +20% più veloce.",
+    bonusPct: 50
+  },
+  {
+    id: "mod_austerita",
+    name: "Austerità Permanente",
+    desc: "Tagli draconiani: tutte le strutture costano +35% in più.",
+    bonusPct: 75
+  }
+];
+
+// 4 Unlockable Endings
+const ENDINGS_DATA = [
+  {
+    id: "end_ecocentrica",
+    title: "FINALE I: LA COMUNE ECOCENTRICA E CONVIVIALE",
+    condText: "Azione Diretta + Ecologia",
+    desc: "Le città sono rifiorite in arcipelaghi di orti urbani, boschi commestibili e assemblee di quartiere. Con 15 ore di lavoro settimanale, la cura della Terra e delle relazioni ha sostituito il PIL."
+  },
+  {
+    id: "end_lusso_auto",
+    title: "FINALE II: IL COMUNISMO AUTOMATIZZATO DI LUSSO",
+    condText: "Azione Diretta + Tecno-Automazione",
+    desc: "Brevetti aperti, fabbriche cibernetiche autogestite e reti energetiche solari garantiscono abbondanza materiale gratuita per ogni essere umano, liberando l'umanità per l'arte e la scienza."
+  },
+  {
+    id: "end_democrazia_radicale",
+    title: "FINALE III: LA FEDERAZIONE DEI BENI COMUNI",
+    condText: "Istituzioni dal Basso + Ecologia",
+    desc: "Attraverso statuti municipali revocabili e bilanci partecipativi, la rendita fondiaria e i monopoli energetici sono stati aboliti costituzionalmente. Ogni quartiere governa i propri beni comuni."
+  },
+  {
+    id: "end_contropotere",
+    title: "FINALE IV: LA REPUBBLICA DEI CONSIGLI OPERAI",
+    condText: "Istituzioni dal Basso + Tecno-Automazione",
+    desc: "I sindacati conflittuali e le cooperative tecnologiche hanno rilevato l'intera infrastruttura produttiva, pianificando democraticamente la transizione post-scarsità."
+  }
+];
+
+const TICKER_HEADLINES = [
+  "«Siamo una grande famiglia», ripete il CEO mentre taglia i buoni pasto e compra il terzo yacht.",
+  "Studio shock: lavorare 50 ore a settimana non rende milionari, rende solo più ricco l'azionista.",
+  "Gentrificazione record: monolocale di 14 mq affittato come 'loft minimalista esperienziale'.",
+  "Il quartiere risponde: aperto nuovo sportello antisfratto e gruppo d'acquisto solidale!",
+  "Economisti mainstream perplessi: «Se nessuno compra fuffa superflua, come farà a crescere il PIL?»",
+  "La solidarietà non è beneficenza: è costruire insieme la forza per non dover più chiedere elemosina.",
+  "Riparare un tostapane in ciclofficina è ora classificato dalle multinazionali come 'atto sovversivo'.",
+  "Ricorda: il riposo collettivo non è pigrizia, è sabotaggio del burnout imposto dal mercato."
+];
+
+// --- 3. GAME STATE & PERSISTENCE ---
+const SAVE_KEY = "comune_8bit_revolution_save_v1";
+
+function createDefaultState() {
+  return {
+    version: 1,
+    lastSaveTime: Date.now(),
+    totalPlaySeconds: 0,
+    wave: 1,
+    act: 1,
+
+    // Resources
+    consciousness: 0,
+    solidarity: 0,
+    energy: 100,
+    bonusMaxEnergy: 0,
+    exploitation: 35,
+    inBurnout: false,
+
+    // Counts
+    structures: {},
+    upgrades: [],
+    completedEvents: [],
+
+    // Ideological Axes for Endings
+    axes: {
+      radical: 0,
+      institutional: 0,
+      ecology: 0,
+      techno: 0
+    },
+
+    // Prestige & Meta
+    memory: 0,
+    doctrines: {},
+    activeModifiers: [],
+    pendingModifiers: [],
+    unlockedEndings: [],
+
+    // Stats
+    stats: {
+      totalClicks: 0,
+      totalConsciousnessEarned: 0,
+      totalSolidarityEarned: 0,
+      totalStrikes: 0,
+      totalRests: 0,
+      wavesCompleted: 0
+    },
+
+    // Log
+    logs: [
+      { time: "GIORNO 1", text: "Cinque vicini si riuniscono in un garage occupato. Nasce il primo nucleo del movimento.", type: "triumph" }
+    ]
+  };
+}
+
+let state = createDefaultState();
+let currentRightTab = "ideas";
+let activeEvent = null;
+let eventCooldown = 38; // seconds until next dilemma event
+let tickerIndex = 0;
+let tickerTimer = 0;
+let autoSaveTimer = 0;
+
+// --- 4. CORE CALCULATIONS & DERIVED STATS ---
+
+function getDocLvl(id) {
+  return state.doctrines[id] || 0;
+}
+
+function hasUpgrade(id) {
+  return state.upgrades.includes(id);
+}
+
+function hasMod(id) {
+  return state.activeModifiers.includes(id);
+}
+
+function getMaxEnergy() {
+  let max = 100 + state.bonusMaxEnergy;
+  max += getDocLvl("doc_cura") * 15;
+  if (hasUpgrade("u_straordinari")) max += 25;
+  if (hasUpgrade("u_burnout_kit")) max += 35;
+  if (hasUpgrade("u_reddito_transizione")) max += 40;
+  return max;
+}
+
+function getGlobalMultiplier() {
+  // Base prestige multiplier: +15% per Memoria Storica
+  let mult = 1 + state.memory * 0.15;
+
+  if (hasUpgrade("u_capitale_umano")) mult *= 1.40;
+  if (hasUpgrade("u_ozio_creativo") && (state.energy / getMaxEnergy()) >= 0.75) {
+    mult *= 1.85;
+  }
+  if (hasUpgrade("u_post_scarsita")) mult *= 2.50;
+
+  // Burnout penalty
+  if (state.inBurnout) {
+    mult *= hasUpgrade("u_burnout_kit") ? 0.70 : 0.50;
+  }
+
+  return mult;
+}
+
+function getConsciousnessMultiplier() {
+  let m = getGlobalMultiplier();
+  m *= 1 + getDocLvl("doc_archivio") * 0.25;
+  if (hasUpgrade("u_trasparenza")) m *= 1.45;
+  if (hasUpgrade("u_merito")) m *= 1.50;
+  if (hasUpgrade("u_meme_warfare")) m *= 1.35;
+  if (hasUpgrade("u_assemblee_fabbrica")) m *= 1.60;
+  if (hasUpgrade("u_cibernetica_verde")) m *= 1.90;
+
+  // High exploitation repression penalty
+  if (state.exploitation >= 75) m *= 0.80;
+  // Challenge modifier
+  if (hasMod("mod_media")) m *= 0.75;
+
+  return m;
+}
+
+function getSolidarityMultiplier() {
+  let m = getGlobalMultiplier();
+  m *= 1 + getDocLvl("doc_mutua") * 0.25;
+  if (hasUpgrade("u_cassa_mutua")) m *= 1.65;
+  if (hasUpgrade("u_esproprio_brevetti")) m *= 1.50;
+  if (hasUpgrade("u_biblioteche_oggetti")) m *= 2.10;
+  if (hasUpgrade("u_cibernetica_verde")) m *= 1.90;
+
+  if (hasMod("mod_tecnofeudalesimo")) m *= 0.75;
+
+  return m;
+}
+
+function getStructureOutput(st) {
+  const count = state.structures[st.id] || 0;
+  if (count === 0) return { c: 0, s: 0, e: 0, ex: 0 };
+
+  let structMult = 1;
+  if ((st.id === "gas" || st.id === "ciclofficina") && hasUpgrade("u_obsolescenza")) structMult *= 1.85;
+  if ((st.id === "sportello_casa" || st.id === "casa_occupata") && hasUpgrade("u_mappa_sfitti")) structMult *= 1.90;
+  if ((st.id === "blocco_logistica" || st.id === "fabbrica_ecologica") && hasUpgrade("u_algoritmi_open")) structMult *= 2.00;
+  if (st.id === "brevetti_aperti" && hasUpgrade("u_esproprio_brevetti")) structMult *= 2.20;
+  if (st.id === "rete_energetica" && hasUpgrade("u_riconversione_bellica")) structMult *= 2.00;
+
+  // Open patents lab synergy: +10% global boost per lab owned
+  const patentLabs = state.structures["brevetti_aperti"] || 0;
+  const patentSynergy = 1 + patentLabs * 0.10;
+
+  const c = st.prodC * count * structMult * patentSynergy * getConsciousnessMultiplier();
+  const s = st.prodS * count * structMult * patentSynergy * getSolidarityMultiplier();
+  const e = st.prodE * count;
+  const ex = st.exploitDelta * count;
+
+  return { c, s, e, ex };
+}
+
+function getRates() {
+  let cRate = 0;
+  let sRate = 0;
+  let eRate = 0.35 + getDocLvl("doc_cura") * 0.30;
+  let exBaseRise = 0.14 + (state.act - 1) * 0.09; // Capital reacts harder in later Acts
+  let exReduction = 0;
+
+  if (hasUpgrade("u_straordinari")) eRate += 0.40;
+  if (hasUpgrade("u_riconversione_bellica")) eRate += 1.80;
+  if (hasUpgrade("u_15_ore")) eRate += 4.00;
+
+  STRUCTURES_DATA.forEach(st => {
+    const out = getStructureOutput(st);
+    cRate += out.c;
+    sRate += out.s;
+    eRate += out.e;
+    exReduction += out.ex; // negative number
+  });
+
+  // Stress from Exploitation
+  const stressThreshold = hasUpgrade("u_reddito_transizione") ? 75 : 50;
+  if (state.exploitation > stressThreshold) {
+    const excess = (state.exploitation - stressThreshold) / 25;
+    eRate -= excess * 1.15;
+  }
+
+  if (hasMod("mod_clima")) {
+    eRate -= 0.65;
+    exBaseRise *= 1.30;
+  }
+  if (hasMod("mod_media")) {
+    exBaseRise *= 1.20;
+  }
+
+  // Exploitation growth reductions
+  exBaseRise *= Math.pow(0.88, getDocLvl("doc_barricate"));
+  if (hasUpgrade("u_greenwashing")) exBaseRise *= 0.80;
+  if (hasUpgrade("u_sciopero_consumi")) exBaseRise *= 0.75;
+
+  let netExploitRate = exBaseRise + exReduction;
+  if (hasUpgrade("u_no_assenteismo")) netExploitRate -= 0.35;
+
+  return { cRate, sRate, eRate, netExploitRate };
+}
+
+function getClickStats() {
+  let gain = 1 + (state.act - 1) * 1.5;
+  // Scale slightly with total structures owned
+  const totalStructs = Object.values(state.structures).reduce((a, b) => a + b, 0);
+  gain += totalStructs * 0.25;
+
+  if (hasUpgrade("u_famiglia")) gain *= 2.0;
+  if (hasUpgrade("u_meme_warfare")) gain *= 2.5;
+  gain *= 1 + getDocLvl("doc_prassi") * 0.50;
+  gain *= getConsciousnessMultiplier();
+
+  let cost = 1.5;
+  if (hasUpgrade("u_burnout_kit")) cost *= 0.65;
+  if (hasMod("mod_tecnofeudalesimo")) cost *= 1.40;
+  if (hasUpgrade("u_15_ore")) cost = 0;
+
+  return { gain, cost };
+}
+
+function getStrikeStats() {
+  const solidarityCost = Math.floor(25 * Math.pow(2.4, state.act - 1));
+  const energyCost = 12;
+  let exploitDrop = 8 + getDocLvl("doc_prassi") * 2;
+  if (hasUpgrade("u_whistleblower")) exploitDrop += 5;
+  const cassaCount = state.structures["cassa_resistenza"] || 0;
+  exploitDrop += Math.min(8, cassaCount * 0.8);
+
+  const consciousnessGain = (15 + totalStructuresCount() * 2) * getConsciousnessMultiplier();
+  return { solidarityCost, energyCost, exploitDrop, consciousnessGain };
+}
+
+function totalStructuresCount() {
+  return Object.values(state.structures).reduce((a, b) => a + b, 0);
+}
+
+function getStructureCost(st) {
+  const count = state.structures[st.id] || 0;
+  const modMult = hasMod("mod_austerita") ? 1.35 : 1.0;
+  const costC = Math.floor(st.baseCostC * Math.pow(st.costScale, count) * modMult);
+  const costS = Math.floor(st.baseCostS * Math.pow(st.costScale, count) * modMult);
+  return { costC, costS };
+}
+
+function getActRequirements(actObj) {
+  const discount = Math.pow(0.85, getDocLvl("doc_accelerazione"));
+  return {
+    reqC: Math.floor(actObj.reqC * discount),
+    reqS: Math.floor(actObj.reqS * discount),
+    reqMaxExploit: actObj.reqMaxExploit
+  };
+}
+
+// --- 5. PLAYER ACTIONS ---
+
+function spawnFloatingText(x, y, text, color = "#ffcd75") {
+  const el = document.createElement("div");
+  el.className = "float-text";
+  el.textContent = text;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.color = color;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function getEventCoords(ev) {
+  if (ev && ev.clientX) return { x: ev.clientX - 25, y: ev.clientY - 20 };
+  const btn = document.getElementById("btnLeaflet");
+  const rect = btn.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2 - 25, y: rect.top };
+}
+
+function manualLeaflet(ev) {
+  if (state.inBurnout) {
+    SoundFX.burnout();
+    const pos = getEventCoords(ev);
+    spawnFloatingText(pos.x, pos.y, "BURNOUT! RIPOSA!", "#ef7d57");
+    return;
+  }
+  const { gain, cost } = getClickStats();
+  if (state.energy < cost) {
+    triggerBurnout();
+    return;
+  }
+
+  state.energy = Math.max(0, state.energy - cost);
+  state.consciousness += gain;
+  state.stats.totalClicks += 1;
+  state.stats.totalConsciousnessEarned += gain;
+
+  SoundFX.click();
+  const pos = getEventCoords(ev);
+  spawnFloatingText(pos.x, pos.y, `+${formatNum(gain)} 🧠`, "#a7f070");
+
+  if (state.energy <= 0) {
+    triggerBurnout();
+  }
+  updateUI();
+}
+
+function collectiveRest(ev) {
+  const maxE = getMaxEnergy();
+  const restore = Math.max(30, maxE * 0.35);
+  state.energy = Math.min(maxE, state.energy + restore);
+  state.stats.totalRests += 1;
+
+  if (state.inBurnout && state.energy >= maxE * 0.30) {
+    state.inBurnout = false;
+    addLog("Il collettivo ha riposato e condiviso cura reciproca. Burnout superato!", "triumph");
+  }
+
+  SoundFX.rest();
+  const pos = getEventCoords(ev);
+  spawnFloatingText(pos.x, pos.y, `+${Math.round(restore)} ⚡`, "#41a6f6");
+  updateUI();
+}
+
+function directStrike(ev) {
+  const st = getStrikeStats();
+  if (state.solidarity < st.solidarityCost || state.energy < st.energyCost || state.inBurnout) {
+    return;
+  }
+
+  state.solidarity -= st.solidarityCost;
+  state.energy -= st.energyCost;
+  state.exploitation = Math.max(0, state.exploitation - st.exploitDrop);
+  state.consciousness += st.consciousnessGain;
+  state.stats.totalConsciousnessEarned += st.consciousnessGain;
+  state.stats.totalStrikes += 1;
+
+  SoundFX.strike();
+  const pos = getEventCoords(ev);
+  spawnFloatingText(pos.x, pos.y, `-${st.exploitDrop.toFixed(1)}% 🏭`, "#ffcd75");
+  addLog(`Sciopero e azione diretta! Sfruttamento ridotto del ${st.exploitDrop.toFixed(1)}%.`, "triumph");
+
+  if (state.energy <= 0) triggerBurnout();
+  updateUI();
+}
+
+function triggerBurnout() {
+  if (!state.inBurnout) {
+    state.inBurnout = true;
+    SoundFX.burnout();
+    addLog("ALLARME BURNOUT! L'energia del collettivo è a zero. Organizza subito Riposo Collettivo!", "crisis");
+  }
+}
+
+function buyStructure(id) {
+  const st = STRUCTURES_DATA.find(x => x.id === id);
+  if (!st || st.act > state.act) return;
+  const { costC, costS } = getStructureCost(st);
+  if (state.consciousness < costC || state.solidarity < costS) return;
+
+  state.consciousness -= costC;
+  state.solidarity -= costS;
+  state.structures[st.id] = (state.structures[st.id] || 0) + 1;
+
+  SoundFX.buy();
+  renderStructures();
+  updateUI();
+}
+
+function buyUpgrade(id) {
+  const up = UPGRADES_DATA.find(x => x.id === id);
+  if (!up || up.act > state.act || hasUpgrade(id)) return;
+  if (state.consciousness < up.costC || state.solidarity < up.costS) return;
+
+  state.consciousness -= up.costC;
+  state.solidarity -= up.costS;
+  state.upgrades.push(id);
+
+  // Instant effects if any
+  if (id === "u_straordinari") state.energy = Math.min(getMaxEnergy(), state.energy + 25);
+  if (id === "u_burnout_kit") state.energy = Math.min(getMaxEnergy(), state.energy + 35);
+  if (id === "u_reddito_transizione") state.energy = Math.min(getMaxEnergy(), state.energy + 40);
+
+  SoundFX.buy();
+  addLog(`Pratica adottata: "${up.name}"`, "triumph");
+  renderUpgrades();
+  renderStructures();
+  updateUI();
+}
+
+function advanceAct() {
+  if (state.act >= 4) return;
+  const currentActObj = ACTS[state.act - 1];
+  const req = getActRequirements(currentActObj);
+
+  if (
+    state.consciousness >= req.reqC &&
+    state.solidarity >= req.reqS &&
+    state.exploitation <= req.reqMaxExploit
+  ) {
+    state.act += 1;
+    const nextAct = ACTS[state.act - 1];
+    SoundFX.actUp();
+    addLog(`SVOLTA STORICA! Inizia l'${nextAct.title}!`, "triumph");
+    renderStructures();
+    renderUpgrades();
+    updateUI();
+  }
+}
+
+// --- 6. RANDOM NEWSPAPER EVENTS & DILEMMAS ---
+
+function triggerRandomEvent() {
+  if (activeEvent) return;
+  const pool = EVENTS_DATA.filter(ev => ev.minAct <= state.act);
+  if (pool.length === 0) return;
+
+  // Prefer events not yet seen in this wave
+  const unseen = pool.filter(ev => !state.completedEvents.includes(ev.id));
+  const candidates = unseen.length > 0 ? unseen : pool;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+
+  activeEvent = chosen;
+  SoundFX.alert();
+
+  document.getElementById("eventMeta").textContent = chosen.meta;
+  document.getElementById("eventTitle").textContent = chosen.title;
+  document.getElementById("eventDesc").textContent = chosen.desc;
+
+  const choicesDiv = document.getElementById("eventChoices");
+  choicesDiv.innerHTML = "";
+
+  chosen.choices.forEach((ch, idx) => {
+    const btn = document.createElement("button");
+    btn.className = idx === 0 ? "pixel-btn btn-red choice-btn" : "pixel-btn choice-btn";
+    btn.innerHTML = `
+      <span style="font-size:10px; line-height:1.45;">▶ ${ch.label}</span>
+      <span style="font-family:'VT323',monospace; font-size:18px; color:var(--accent-gold);">${ch.effectText}</span>
+    `;
+    btn.onclick = () => resolveEventChoice(ch);
+    choicesDiv.appendChild(btn);
+  });
+
+  document.getElementById("eventModal").classList.add("open");
+}
+
+function resolveEventChoice(choice) {
+  if (!activeEvent) return;
+  choice.apply(state);
+  if (!state.completedEvents.includes(activeEvent.id)) {
+    state.completedEvents.push(activeEvent.id);
+  }
+  addLog(`Decisione presa su "${activeEvent.title}": ${choice.label}`, "info");
+  SoundFX.buy();
+  activeEvent = null;
+  document.getElementById("eventModal").classList.remove("open");
+  updateUI();
+}
+
+// --- 7. PRESTIGE ("NUOVA ONDA STORICA"), DOCTRINES & 4 ENDINGS ---
+
+function calculatePrestigeGain() {
+  if (state.act < 4) return 0;
+  const resourceScore = Math.floor(Math.sqrt((state.consciousness + state.solidarity) / 15000));
+  const eventBonus = Math.floor(state.completedEvents.length / 2);
+  let modMultiplier = 1;
+  state.activeModifiers.forEach(mId => {
+    const m = MODIFIERS_DATA.find(x => x.id === mId);
+    if (m) modMultiplier += m.bonusPct / 100;
+  });
+  const docMult = 1 + getDocLvl("doc_internazionale") * 0.40;
+  return Math.max(1, Math.floor((resourceScore + eventBonus) * modMultiplier * docMult));
+}
+
+function canPrestige() {
+  return (
+    state.act === 4 &&
+    state.exploitation <= 10 &&
+    state.consciousness >= 150000 &&
+    state.solidarity >= 80000
+  );
+}
+
+function determineEnding() {
+  const { radical, institutional, ecology, techno } = state.axes;
+  const isRadical = radical >= institutional;
+  const isEco = ecology >= techno;
+
+  if (isRadical && isEco) return ENDINGS_DATA[0];
+  if (isRadical && !isEco) return ENDINGS_DATA[1];
+  if (!isRadical && isEco) return ENDINGS_DATA[2];
+  return ENDINGS_DATA[3];
+}
+
+function openPrestigeModal() {
+  const gain = calculatePrestigeGain();
+  const ready = canPrestige();
+  document.getElementById("prestigeGainPreview").textContent = `+${gain}`;
+  document.getElementById("prestigeReqStatus").innerHTML = ready
+    ? `<span style="color:var(--accent-green-hi);">✔ REQUISITI SODDISFATTI! La società post-scarsità è pronta a fiorire.</span>`
+    : `Requisiti: Atto IV (attuale: ${state.act}), Sfruttamento &le; 10% (attuale: ${state.exploitation.toFixed(1)}%), 🧠 &ge; 150k, 🤝 &ge; 80k.`;
+
+  document.getElementById("btnTriggerPrestige").disabled = !ready;
+
+  // Render challenge modifiers
+  const modContainer = document.getElementById("modifiersList");
+  modContainer.innerHTML = "";
+  MODIFIERS_DATA.forEach(m => {
+    const checked = state.pendingModifiers.includes(m.id);
+    const row = document.createElement("div");
+    row.className = "modifier-row";
+    row.innerHTML = `
+      <div>
+        <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--accent-gold);">
+          ${m.name} (+${m.bonusPct}% 📚)
+        </div>
+        <div style="font-size:18px; color:var(--text-muted);">${m.desc}</div>
+      </div>
+      <button class="pixel-btn ${checked ? 'btn-red' : 'btn-dark'}" style="font-size:8px; min-width:85px;" onclick="togglePendingModifier('${m.id}')">
+        ${checked ? 'ATTIVO' : 'DISATTIVO'}
+      </button>
+    `;
+    modContainer.appendChild(row);
+  });
+
+  document.getElementById("prestigeModal").classList.add("open");
+}
+
+function togglePendingModifier(id) {
+  const idx = state.pendingModifiers.indexOf(id);
+  if (idx >= 0) state.pendingModifiers.splice(idx, 1);
+  else state.pendingModifiers.push(id);
+  SoundFX.click();
+  openPrestigeModal();
+}
+
+function triggerPrestige() {
+  if (!canPrestige()) return;
+  const gain = calculatePrestigeGain();
+  const ending = determineEnding();
+
+  if (!state.unlockedEndings.includes(ending.id)) {
+    state.unlockedEndings.push(ending.id);
+  }
+
+  // Keep persistent meta state
+  const keepMemory = state.memory + gain;
+  const keepDoctrines = { ...state.doctrines };
+  const keepEndings = [...state.unlockedEndings];
+  const keepStats = { ...state.stats, wavesCompleted: state.stats.wavesCompleted + 1 };
+  const nextWave = state.wave + 1;
+  const nextModifiers = [...state.pendingModifiers];
+
+  state = createDefaultState();
+  state.wave = nextWave;
+  state.memory = keepMemory;
+  state.doctrines = keepDoctrines;
+  state.unlockedEndings = keepEndings;
+  state.stats = keepStats;
+  state.activeModifiers = nextModifiers;
+  state.pendingModifiers = [...nextModifiers];
+
+  // Apply starting doctrine bonuses
+  const startLvl = getDocLvl("doc_avanguardia");
+  if (startLvl > 0) {
+    state.consciousness = startLvl * 150;
+    state.solidarity = startLvl * 100;
+    state.structures["gas"] = startLvl * 2;
+  }
+  state.energy = getMaxEnergy();
+
+  SoundFX.prestige();
+  closeModal("prestigeModal");
+  addLog(`NUOVA ONDA STORICA #${state.wave}! Ottenuti +${gain} punti Memoria Storica.`, "triumph");
+
+  // Show Ending Unlocked Banner
+  document.getElementById("infoModalMast").textContent = "ORIZZONTE STORICO RAGGIUNTO!";
+  document.getElementById("infoModalSub").textContent = `ONDA #${nextWave - 1} COMPLETATA • +${gain} 📚 MEMORIA STORICA`;
+  document.getElementById("infoModalBody").innerHTML = `
+    <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:var(--accent-gold); margin-bottom:10px; line-height:1.5;">
+      ${ending.title}
+    </div>
+    <p style="margin:0 0 10px 0;">${ending.desc}</p>
+    <div style="color:var(--accent-green-hi);">
+      Bonus permanente attivo: <strong>+${state.memory * 15}%</strong> produzione globale (${state.memory} 📚).
+    </div>
+  `;
+  document.getElementById("infoModal").classList.add("open");
+
+  renderStructures();
+  renderUpgrades();
+  renderDoctrines();
+  updateUI();
+  saveGame();
+}
+
+function buyDoctrine(id) {
+  const doc = DOCTRINES_DATA.find(d => d.id === id);
+  if (!doc) return;
+  const lvl = getDocLvl(id);
+  if (lvl >= doc.maxLvl) return;
+  const cost = doc.baseCost + lvl * doc.costStep;
+  if (state.memory < cost) return;
+
+  state.memory -= cost;
+  state.doctrines[id] = lvl + 1;
+  state.energy = Math.min(getMaxEnergy(), state.energy + 15);
+
+  SoundFX.buy();
+  renderDoctrines();
+  updateUI();
+  saveGame();
+}
+
+// --- 8. UI RENDERING ---
+
+function formatNum(n) {
+  if (!isFinite(n)) return "∞";
+  if (n < 1000) return n.toFixed(n < 10 && n % 1 !== 0 ? 1 : 0);
+  const units = ["K", "M", "B", "T", "Qa"];
+  let u = -1;
+  let val = n;
+  while (val >= 1000 && u < units.length - 1) {
+    val /= 1000;
+    u++;
+  }
+  return val.toFixed(2) + units[u];
+}
+
+function addLog(text, type = "info") {
+  const day = Math.floor(state.totalPlaySeconds / 30) + 1;
+  state.logs.unshift({ time: `GIORNO ${day}`, text, type });
+  if (state.logs.length > 40) state.logs.pop();
+  if (currentRightTab === "log") renderLogs();
+}
+
+function switchRightTab(tab) {
+  currentRightTab = tab;
+  document.getElementById("tabBtnIdeas").classList.toggle("active", tab === "ideas");
+  document.getElementById("tabBtnDoctrines").classList.toggle("active", tab === "doctrines");
+  document.getElementById("tabBtnLog").classList.toggle("active", tab === "log");
+
+  document.getElementById("rightPanelIdeas").style.display = tab === "ideas" ? "flex" : "none";
+  document.getElementById("rightPanelDoctrines").style.display = tab === "doctrines" ? "flex" : "none";
+  document.getElementById("rightPanelLog").style.display = tab === "log" ? "flex" : "none";
+
+  if (tab === "ideas") renderUpgrades();
+  if (tab === "doctrines") renderDoctrines();
+  if (tab === "log") renderLogs();
+}
+
+function renderStructures() {
+  const container = document.getElementById("structuresList");
+  container.innerHTML = "";
+
+  STRUCTURES_DATA.forEach(st => {
+    const unlocked = st.act <= state.act;
+    const count = state.structures[st.id] || 0;
+    const { costC, costS } = getStructureCost(st);
+    const out = getStructureOutput(st);
+
+    const card = document.createElement("div");
+    card.className = "item-card" + (unlocked ? "" : " locked-act");
+
+    if (!unlocked) {
+      card.innerHTML = `
+        <div class="item-info">
+          <div class="item-header">
+            <span class="item-title">🔒 SBLOCCABILE IN ATTO ${st.act}</span>
+          </div>
+          <div class="item-desc">Avanza nella lotta per scoprire questa pratica collettiva.</div>
+        </div>
+      `;
+    } else {
+      const canAfford = state.consciousness >= costC && state.solidarity >= costS;
+      const singleC = st.prodC * getConsciousnessMultiplier();
+      const singleS = st.prodS * getSolidarityMultiplier();
+      card.innerHTML = `
+        <div class="item-info">
+          <div class="item-header">
+            <span class="item-title">${st.name}</span>
+            <span class="item-count">x${count}</span>
+          </div>
+          <div class="item-desc">${st.desc}</div>
+          <div class="item-stats">
+            +${formatNum(singleC)} 🧠/s • +${formatNum(singleS)} 🤝/s • +${st.prodE.toFixed(2)} ⚡/s • ${st.exploitDelta.toFixed(3)}%/s 🏭
+            ${count > 0 ? `<span style="color:var(--accent-gold);">[Tot: +${formatNum(out.c)} 🧠/s, +${formatNum(out.s)} 🤝/s]</span>` : ""}
+          </div>
+        </div>
+        <button class="pixel-btn buy-btn" id="buy_st_${st.id}" ${canAfford ? "" : "disabled"} onclick="buyStructure('${st.id}')">
+          <span>ATTIVA</span>
+          <span style="font-family:'VT323',monospace; font-size:17px;">
+            ${formatNum(costC)} 🧠 ${costS > 0 ? `+ ${formatNum(costS)} 🤝` : ""}
+          </span>
+        </button>
+      `;
+    }
+    container.appendChild(card);
+  });
+}
+
+function renderUpgrades() {
+  const container = document.getElementById("rightPanelIdeas");
+  container.innerHTML = "";
+  document.getElementById("ideasCount").textContent = `${state.upgrades.length}/${UPGRADES_DATA.length}`;
+
+  UPGRADES_DATA.forEach(up => {
+    if (up.act > state.act + 1) return; // Show current + preview next Act
+    const bought = hasUpgrade(up.id);
+    const locked = up.act > state.act;
+    const canAfford = !bought && !locked && state.consciousness >= up.costC && state.solidarity >= up.costS;
+
+    const card = document.createElement("div");
+    card.className = "upgrade-card" + (bought ? " purchased" : "");
+    card.innerHTML = `
+      <div class="upgrade-top">
+        <div>
+          <span style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--accent-cyan);">ATTO ${up.act}</span>
+          <div class="item-title" style="margin-top:3px;">${bought ? "✔ " : ""}${up.name}</div>
+        </div>
+        ${
+          bought
+            ? `<span class="item-count" style="color:var(--accent-green-hi);">ATTIVA</span>`
+            : locked
+            ? `<span class="item-count">ATTO ${up.act}</span>`
+            : `<button class="pixel-btn btn-gold" id="buy_up_${up.id}" style="font-size:8px; padding:6px 8px;" ${canAfford ? "" : "disabled"} onclick="buyUpgrade('${up.id}')">
+                ${formatNum(up.costC)} 🧠 ${up.costS > 0 ? `+ ${formatNum(up.costS)} 🤝` : ""}
+               </button>`
+        }
+      </div>
+      <div class="satire-quote">${up.quote}</div>
+      <div class="item-stats">${up.effectDesc}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderDoctrines() {
+  const container = document.getElementById("rightPanelDoctrines");
+  container.innerHTML = `
+    <div class="pixel-box-dark" style="padding:8px 10px; margin:0 0 4px 0;">
+      <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--accent-gold);">
+        📚 MEMORIA STORICA DISPONIBILE: ${state.memory}
+      </div>
+      <div style="font-size:18px; color:var(--text-muted);">
+        Ogni punto non speso dona +15% produzione globale. Spendi punti per sbloccare Dottrine permanenti!
+      </div>
+    </div>
+  `;
+
+  DOCTRINES_DATA.forEach(doc => {
+    const lvl = getDocLvl(doc.id);
+    const maxed = lvl >= doc.maxLvl;
+    const cost = doc.baseCost + lvl * doc.costStep;
+    const canAfford = !maxed && state.memory >= cost;
+
+    const card = document.createElement("div");
+    card.className = "item-card";
+    card.innerHTML = `
+      <div class="item-info">
+        <div class="item-header">
+          <span class="item-title">${doc.name}</span>
+          <span class="item-count">LV ${lvl}/${doc.maxLvl}</span>
+        </div>
+        <div class="item-desc">${doc.desc}</div>
+      </div>
+      <button class="pixel-btn btn-gold" style="font-size:8px; min-width:95px;" ${canAfford ? "" : "disabled"} onclick="buyDoctrine('${doc.id}')">
+        ${maxed ? "MAX" : `POTENZIA (${cost} 📚)`}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderLogs() {
+  const container = document.getElementById("rightPanelLog");
+  container.innerHTML = "";
+  state.logs.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = `log-entry ${entry.type}`;
+    div.innerHTML = `
+      <div class="log-time">${entry.time}</div>
+      <div>${entry.text}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function updateUI() {
+  const rates = getRates();
+  const maxE = getMaxEnergy();
+  const clickInfo = getClickStats();
+  const strikeInfo = getStrikeStats();
+  const actObj = ACTS[state.act - 1];
+
+  // Header Badges
+  document.getElementById("headerActBadge").textContent = actObj.badge;
+  document.getElementById("headerWaveBadge").textContent = `ONDA #${state.wave}`;
+  document.getElementById("headerMemoryBadge").textContent = `📚 ${state.memory} MEMORIA`;
+  document.getElementById("sceneTitle").textContent = actObj.scene;
+  document.getElementById("clockDisplay").textContent = `GIORNO ${Math.floor(state.totalPlaySeconds / 30) + 1}`;
+  document.getElementById("globalMultBadge").textContent = `MOLT: ${getGlobalMultiplier().toFixed(2)}x`;
+
+  // Resources
+  document.getElementById("resConsciousness").textContent = formatNum(state.consciousness);
+  document.getElementById("rateConsciousness").textContent = `+${formatNum(rates.cRate)} /s`;
+
+  document.getElementById("resSolidarity").textContent = formatNum(state.solidarity);
+  document.getElementById("rateSolidarity").textContent = `+${formatNum(rates.sRate)} /s`;
+
+  // Energy Bar
+  const ePct = Math.max(0, Math.min(100, (state.energy / maxE) * 100));
+  const eBar = document.getElementById("energyBar");
+  eBar.style.width = `${ePct}%`;
+  eBar.className = "bar-fill bar-energy" + (state.inBurnout ? " burnout" : ePct < 25 ? " low" : "");
+  document.getElementById("energyText").textContent =
+    `${Math.round(state.energy)} / ${Math.round(maxE)} (${rates.eRate >= 0 ? "+" : ""}${rates.eRate.toFixed(1)}/s)`;
+  document.getElementById("burnoutBanner").style.display = state.inBurnout ? "block" : "none";
+
+  // Exploitation Bar
+  const exBar = document.getElementById("exploitBar");
+  exBar.style.width = `${state.exploitation.toFixed(1)}%`;
+  exBar.className = "bar-fill bar-exploit" + (state.exploitation >= 75 ? " critical" : "");
+  document.getElementById("exploitText").textContent =
+    `${state.exploitation.toFixed(1)}% (${rates.netExploitRate >= 0 ? "+" : ""}${rates.netExploitRate.toFixed(2)}%/s)`;
+
+  // Buttons
+  document.getElementById("btnLeaflet").disabled = state.inBurnout || state.energy < clickInfo.cost;
+  document.getElementById("leafletSub").textContent =
+    `+${formatNum(clickInfo.gain)} 🧠 | ${clickInfo.cost === 0 ? "Gratis (15h!)" : `Costa ${clickInfo.cost.toFixed(1)} ⚡`}`;
+
+  document.getElementById("restSub").textContent = `+${Math.round(Math.max(30, maxE * 0.35))} ⚡ (Cura Burnout)`;
+
+  const canStrike = !state.inBurnout && state.solidarity >= strikeInfo.solidarityCost && state.energy >= strikeInfo.energyCost;
+  document.getElementById("btnStrike").disabled = !canStrike;
+  document.getElementById("strikeSub").textContent =
+    `-${strikeInfo.exploitDrop.toFixed(0)}% 🏭 | ${formatNum(strikeInfo.solidarityCost)} 🤝 + ${strikeInfo.energyCost} ⚡`;
+
+  // Act Card
+  document.getElementById("actCardTitle").textContent = actObj.title;
+  document.getElementById("actCardDesc").textContent = actObj.desc;
+  const advBtn = document.getElementById("btnAdvanceAct");
+  if (state.act < 4) {
+    const req = getActRequirements(actObj);
+    const ready = state.consciousness >= req.reqC && state.solidarity >= req.reqS && state.exploitation <= req.reqMaxExploit;
+    advBtn.disabled = !ready;
+    advBtn.textContent = `ATTO ${state.act + 1}: ${formatNum(req.reqC)} 🧠, ${formatNum(req.reqS)} 🤝, 🏭 ≤ ${req.reqMaxExploit}%`;
+  } else {
+    const prestigeReady = canPrestige();
+    advBtn.disabled = !prestigeReady;
+    advBtn.textContent = prestigeReady
+      ? "✨ REALIZZA LA SOCIETÀ POST-SCARSITÀ!"
+      : "OBIETTIVO: 🏭 ≤ 10%, 150K 🧠, 80K 🤝";
+    advBtn.onclick = openPrestigeModal;
+  }
+
+  // Update buy button states without re-building DOM every frame
+  STRUCTURES_DATA.forEach(st => {
+    const btn = document.getElementById(`buy_st_${st.id}`);
+    if (btn) {
+      const { costC, costS } = getStructureCost(st);
+      btn.disabled = state.consciousness < costC || state.solidarity < costS;
+    }
+  });
+
+  UPGRADES_DATA.forEach(up => {
+    const btn = document.getElementById(`buy_up_${up.id}`);
+    if (btn) {
+      btn.disabled = state.consciousness < up.costC || state.solidarity < up.costS;
+    }
+  });
+}
+
+// --- 9. ANIMATED PIXEL-ART CANVAS ENGINE (EVOLVING ACROSS 4 ACTS) ---
+const canvas = document.getElementById("worldCanvas");
+const ctx = canvas.getContext("2d");
+let animTime = 0;
+
+function drawPixelRect(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+}
+
+function renderPixelScene(dt) {
+  animTime += dt;
+  const W = 320;
+  const H = 110;
+
+  // 1. Sky gradient based on Act & Exploitation
+  let skyTop = "#1b1e34";
+  let skyBot = "#2e3559";
+  if (state.act === 2) { skyTop = "#222b52"; skyBot = "#45568c"; }
+  if (state.act === 3) { skyTop = "#2d3b6e"; skyBot = "#c96d53"; }
+  if (state.act === 4) { skyTop = "#29699e"; skyBot = "#73d0b5"; }
+  if (state.exploitation > 75) {
+    skyTop = "#3b1725";
+    skyBot = "#6e2938";
+  }
+
+  drawPixelRect(0, 0, W, 55, skyTop);
+  drawPixelRect(0, 55, W, 35, skyBot);
+
+  // Sun or Moon
+  if (state.act >= 3) {
+    const sunY = state.act === 4 ? 22 : 42;
+    drawPixelRect(255, sunY, 16, 16, "#ffcd75");
+    drawPixelRect(257, sunY - 2, 12, 20, "#ffcd75");
+  } else {
+    drawPixelRect(265, 16, 10, 10, "#f4f4f4");
+    drawPixelRect(268, 16, 7, 7, skyTop);
+  }
+
+  // Drifting Pixel Clouds
+  for (let i = 0; i < 3; i++) {
+    const cx = ((i * 115 + animTime * (6 + i * 2)) % (W + 40)) - 20;
+    const cy = 14 + i * 10;
+    const cloudCol = state.exploitation > 75 ? "#694a58" : "#cbd5e1";
+    drawPixelRect(cx, cy, 22, 6, cloudCol);
+    drawPixelRect(cx + 4, cy - 3, 14, 4, cloudCol);
+  }
+
+  // 2. Background Factory / Ecological Conversion (Right Side)
+  drawPixelRect(215, 48, 75, 42, "#262b44");
+  drawPixelRect(222, 56, 12, 10, state.act >= 3 ? "#a7f070" : "#ffcd75");
+  drawPixelRect(240, 56, 12, 10, state.act >= 3 ? "#a7f070" : "#ffcd75");
+  drawPixelRect(258, 56, 12, 10, state.act >= 3 ? "#a7f070" : "#ffcd75");
+
+  // Smokestack -> Wind Turbine in Act III/IV
+  drawPixelRect(272, 24, 10, 24, "#3b4266");
+  if (state.act < 3) {
+    // Polluting smoke puffs
+    for (let s = 0; s < 4; s++) {
+      const sy = 20 - ((animTime * 12 + s * 6) % 20);
+      const sx = 274 + Math.sin(animTime * 2 + s) * 4;
+      drawPixelRect(sx, sy, 6, 5, "#474b66");
+    }
+  } else {
+    // Clean Wind Turbine blades spinning
+    const blade = Math.floor(animTime * 6) % 2;
+    drawPixelRect(276, 12, 2, 12, "#f4f4f4");
+    if (blade === 0) {
+      drawPixelRect(268, 17, 18, 2, "#f4f4f4");
+    } else {
+      drawPixelRect(271, 13, 12, 2, "#f4f4f4");
+      drawPixelRect(271, 21, 12, 2, "#f4f4f4");
+    }
+  }
+
+  // 3. Main Community Building (Left-Center)
+  drawPixelRect(22, 42, 92, 48, "#3b2d4a");
+  drawPixelRect(18, 38, 100, 5, "#b13e53"); // Roof trim
+  // Solar panels on roof in Act II+
+  if (state.act >= 2) {
+    drawPixelRect(28, 33, 24, 5, "#41a6f6");
+    drawPixelRect(58, 33, 24, 5, "#41a6f6");
+  }
+  // Windows & Door
+  drawPixelRect(34, 52, 16, 14, "#ffcd75");
+  drawPixelRect(84, 52, 16, 14, "#ffcd75");
+  drawPixelRect(58, 62, 18, 28, "#1a1c2c");
+
+  // Revolutionary Banner across building
+  const bannerColor = state.act >= 3 ? "#38b764" : "#b13e53";
+  drawPixelRect(26, 44, 84, 7, bannerColor);
+  drawPixelRect(30, 46, 76, 2, "#ffcd75");
+
+  // Waving Red & Gold Flag on Roof
+  const waveOffset = Math.sin(animTime * 7) > 0 ? 1 : 0;
+  drawPixelRect(108, 20, 2, 18, "#f4f4f4");
+  drawPixelRect(110, 20 + waveOffset, 14, 8, "#b13e53");
+  drawPixelRect(112, 22 + waveOffset, 3, 3, "#ffcd75");
+
+  // 4. Ground / Plaza
+  drawPixelRect(0, 90, W, 20, state.act >= 3 ? "#2b4a3e" : "#282c3f");
+  drawPixelRect(0, 90, W, 2, "#0c0d14");
+
+  // Urban Gardens & Trees (Grow in Act II -> Lush in Act IV)
+  if (state.act >= 2) {
+    drawPixelRect(130, 84, 34, 6, "#5a3921");
+    drawPixelRect(133, 81, 6, 3, "#38b764");
+    drawPixelRect(143, 80, 7, 4, "#a7f070");
+    drawPixelRect(154, 81, 6, 3, "#38b764");
+  }
+  if (state.act >= 4) {
+    // Pixel Trees
+    [12, 188, 300].forEach(tx => {
+      drawPixelRect(tx, 72, 4, 18, "#5a3921");
+      drawPixelRect(tx - 6, 60, 16, 14, "#38b764");
+      drawPixelRect(tx - 4, 56, 12, 6, "#a7f070");
+    });
+  }
+
+  // 5. Animated Pixel Citizens / Activists
+  const citizenCount = Math.min(9, 2 + Math.floor(totalStructuresCount() / 4));
+  const shirtColors = ["#ef7d57", "#41a6f6", "#ffcd75", "#a7f070", "#f4f4f4"];
+  for (let c = 0; c < citizenCount; c++) {
+    const baseX = 48 + c * 26;
+    const walk = Math.sin(animTime * 3 + c * 1.7) * 5;
+    const bob = Math.abs(Math.sin(animTime * 6 + c)) * 1.5;
+    const px = baseX + walk;
+    const py = 78 - bob;
+
+    // Head
+    drawPixelRect(px, py, 4, 4, "#f4cca1");
+    // Body
+    drawPixelRect(px - 1, py + 4, 6, 5, shirtColors[c % shirtColors.length]);
+    // Legs
+    drawPixelRect(px - 1, py + 9, 2, 3, "#11131f");
+    drawPixelRect(px + 3, py + 9, 2, 3, "#11131f");
+
+    // Protest sign or book in hand
+    if (c % 2 === 0 && state.act <= 3) {
+      drawPixelRect(px + 5, py - 4, 1, 10, "#cbd5e1");
+      drawPixelRect(px + 2, py - 8, 8, 5, "#ffcd75");
+    }
+  }
+}
+
+// --- 10. MODALS, ARCHIVE & BASE64 SAVE SYSTEM ---
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("open");
+}
+
+function openStatsModal() {
+  const s = state.stats;
+  document.getElementById("statsSummary").innerHTML = `
+    <div class="res-card"><div class="res-name">ONDE COMPLETATE</div><div class="res-val">${s.wavesCompleted}</div></div>
+    <div class="res-card"><div class="res-name">VOLANTINAGGI</div><div class="res-val">${formatNum(s.totalClicks)}</div></div>
+    <div class="res-card"><div class="res-name">SCIOPERI LANCIATI</div><div class="res-val">${s.totalStrikes}</div></div>
+    <div class="res-card"><div class="res-name">RIPOSI COLLETTIVI</div><div class="res-val">${s.totalRests}</div></div>
+    <div class="res-card"><div class="res-name">TOTALE 🧠 GENERATA</div><div class="res-val">${formatNum(s.totalConsciousnessEarned)}</div></div>
+    <div class="res-card"><div class="res-name">TOTALE 🤝 GENERATO</div><div class="res-val">${formatNum(s.totalSolidarityEarned)}</div></div>
+  `;
+
+  const endDiv = document.getElementById("endingsList");
+  endDiv.innerHTML = "";
+  ENDINGS_DATA.forEach(end => {
+    const unlocked = state.unlockedEndings.includes(end.id);
+    const card = document.createElement("div");
+    card.className = "ending-card" + (unlocked ? " unlocked" : "");
+    card.innerHTML = `
+      <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:${unlocked ? 'var(--accent-gold)' : 'var(--text-muted)'}; margin-bottom:4px;">
+        ${unlocked ? "🏆 " + end.title : "🔒 FINALE BLOCCATO (" + end.condText + ")"}
+      </div>
+      <div style="font-size:18px; color:${unlocked ? 'var(--text-light)' : 'var(--text-muted)'};">
+        ${unlocked ? end.desc : "Completa l'Atto IV orientando le tue scelte negli eventi politici per sbloccare questo orizzonte."}
+      </div>
+    `;
+    endDiv.appendChild(card);
+  });
+
+  document.getElementById("statsModal").classList.add("open");
+}
+
+function openSaveModal() {
+  document.getElementById("saveFeedback").textContent = "";
+  document.getElementById("saveModal").classList.add("open");
+}
+
+function saveGame() {
+  state.lastSaveTime = Date.now();
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn("Salvataggio localStorage non riuscito:", e);
+  }
+}
+
+function manualSaveNow() {
+  saveGame();
+  SoundFX.buy();
+  document.getElementById("saveFeedback").textContent = "✔ Partita salvata in localStorage!";
+}
+
+function exportSaveBase64() {
+  saveGame();
+  const json = JSON.stringify(state);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  const area = document.getElementById("saveBase64Area");
+  area.value = b64;
+  area.select();
+  SoundFX.buy();
+  document.getElementById("saveFeedback").textContent = "✔ Stringa Base64 generata! Copiala al sicuro.";
+}
+
+function importSaveBase64() {
+  const area = document.getElementById("saveBase64Area");
+  const raw = area.value.trim();
+  if (!raw) {
+    document.getElementById("saveFeedback").textContent = "⚠️ Incolla prima una stringa Base64 valida.";
+    return;
+  }
+  try {
+    const json = decodeURIComponent(escape(atob(raw)));
+    const parsed = JSON.parse(json);
+    if (!parsed || typeof parsed.consciousness !== "number" || typeof parsed.act !== "number") {
+      throw new Error("Formato non valido");
+    }
+    state = Object.assign(createDefaultState(), parsed);
+    saveGame();
+    renderStructures();
+    renderUpgrades();
+    renderDoctrines();
+    updateUI();
+    SoundFX.actUp();
+    document.getElementById("saveFeedback").textContent = "✔ Salvataggio importato con successo!";
+  } catch (err) {
+    SoundFX.burnout();
+    document.getElementById("saveFeedback").textContent = "❌ Errore: stringa Base64 corrotta o non valida.";
+  }
+}
+
+function hardResetGame() {
+  if (!confirm("Vuoi davvero cancellare TUTTI i progressi, incluse Onde Storiche e Finali?")) return;
+  localStorage.removeItem(SAVE_KEY);
+  state = createDefaultState();
+  renderStructures();
+  renderUpgrades();
+  renderDoctrines();
+  updateUI();
+  closeModal("saveModal");
+  SoundFX.burnout();
+}
+
+function loadGameAndOfflineProgress() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    state = Object.assign(createDefaultState(), parsed);
+
+    const now = Date.now();
+    const elapsedSec = Math.min(28800, Math.max(0, (now - (state.lastSaveTime || now)) / 1000)); // cap 8h
+
+    if (elapsedSec > 15) {
+      const rates = getRates();
+      const offlineMult = 0.65; // 65% offline efficiency
+      const gainedC = Math.max(0, rates.cRate * elapsedSec * offlineMult);
+      const gainedS = Math.max(0, rates.sRate * elapsedSec * offlineMult);
+
+      state.consciousness += gainedC;
+      state.solidarity += gainedS;
+      state.stats.totalConsciousnessEarned += gainedC;
+      state.stats.totalSolidarityEarned += gainedS;
+      state.totalPlaySeconds += elapsedSec;
+
+      // Energy recovers offline
+      state.energy = Math.min(getMaxEnergy(), state.energy + Math.max(0.2, rates.eRate) * elapsedSec * 0.5);
+      if (state.energy > getMaxEnergy() * 0.3) state.inBurnout = false;
+
+      // Exploitation drifts gently offline (capped at 85% so player doesn't return to instant crisis)
+      state.exploitation = Math.max(0, Math.min(85, state.exploitation + rates.netExploitRate * elapsedSec * 0.25));
+
+      const mins = Math.floor(elapsedSec / 60);
+      const secs = Math.floor(elapsedSec % 60);
+      document.getElementById("infoModalMast").textContent = "RAPPORTO DAL TURNO DI NOTTE";
+      document.getElementById("infoModalSub").textContent = `TEMPO TRASCORSO OFFLINE: ${mins}m ${secs}s`;
+      document.getElementById("infoModalBody").innerHTML = `
+        <p style="margin-top:0;">Mentre eri lontano, i presìdi e le reti mutualistiche hanno continuato a lavorare:</p>
+        <ul style="line-height:1.6;">
+          <li><strong>+${formatNum(gainedC)} 🧠</strong> Coscienza Critica</li>
+          <li><strong>+${formatNum(gainedS)} 🤝</strong> Mutuo Soccorso</li>
+          <li>Energia Vitale rigenerata fino a <strong>${Math.round(state.energy)} ⚡</strong></li>
+        </ul>
+      `;
+      document.getElementById("infoModal").classList.add("open");
+    }
+  } catch (e) {
+    console.warn("Errore caricamento salvataggio:", e);
+  }
+}
+
+function toggleAudio() {
+  SoundFX.enabled = !SoundFX.enabled;
+  if (SoundFX.enabled) SoundFX.click();
+  document.getElementById("btnAudio").textContent = SoundFX.enabled ? "🔊 AUDIO: ON" : "🔇 AUDIO: OFF";
+}
+
+function toggleCrt() {
+  const on = document.body.classList.toggle("crt-enabled");
+  SoundFX.click();
+  document.getElementById("btnCrt").textContent = on ? "📺 CRT: ON" : "📺 CRT: OFF";
+}
+
+// --- 11. MAIN DELTA-TIME GAME LOOP ---
+
+let lastFrameTime = performance.now();
+
+function gameLoop(now) {
+  const rawDt = (now - lastFrameTime) / 1000;
+  lastFrameTime = now;
+  const dt = Math.min(1.0, Math.max(0, rawDt)); // Clamp frame spike safely
+
+  // Pause simulation only while reading a breaking newspaper dilemma
+  if (!activeEvent) {
+    state.totalPlaySeconds += dt;
+    const rates = getRates();
+    const maxE = getMaxEnergy();
+
+    // Passive Resources
+    const dC = rates.cRate * dt;
+    const dS = rates.sRate * dt;
+    state.consciousness += dC;
+    state.solidarity += dS;
+    state.stats.totalConsciousnessEarned += dC;
+    state.stats.totalSolidarityEarned += dS;
+
+    // Energy & Burnout check
+    state.energy = Math.max(0, Math.min(maxE, state.energy + rates.eRate * dt));
+    if (state.energy <= 0 && !state.inBurnout) {
+      triggerBurnout();
+    }
+
+    // Exploitation Index
+    state.exploitation = Math.max(0, Math.min(100, state.exploitation + rates.netExploitRate * dt));
+    if (state.exploitation >= 100) {
+      // Systemic Crackdown Crisis!
+      state.consciousness *= 0.75;
+      state.solidarity *= 0.75;
+      state.exploitation = 72;
+      triggerBurnout();
+      addLog("CRISI SISTEMICA! Il Capitale ha raggiunto il 100% di Sfruttamento: sgomberi e repressione (-25% risorse)!", "crisis");
+    }
+
+    // Newspaper Ticker rotation
+    tickerTimer += dt;
+    if (tickerTimer >= 12) {
+      tickerTimer = 0;
+      tickerIndex = (tickerIndex + 1) % TICKER_HEADLINES.length;
+      document.getElementById("tickerText").textContent = TICKER_HEADLINES[tickerIndex];
+    }
+
+    // Random Dilemma Event Timer
+    eventCooldown -= dt;
+    if (eventCooldown <= 0) {
+      eventCooldown = 48 + Math.random() * 25;
+      triggerRandomEvent();
+    }
+
+    // Auto-save every 10s
+    autoSaveTimer += dt;
+    if (autoSaveTimer >= 10) {
+      autoSaveTimer = 0;
+      saveGame();
+    }
+  }
+
+  renderPixelScene(dt);
+  updateUI();
+  requestAnimationFrame(gameLoop);
+}
+
+// --- 12. BOOTSTRAP ---
+loadGameAndOfflineProgress();
+renderStructures();
+renderUpgrades();
+renderDoctrines();
+renderLogs();
+updateUI();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
